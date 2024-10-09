@@ -19,6 +19,7 @@ import MenuManager from './components/admin/MenuManager.jsx';
 import Orderlist from './components/admin/Orderlist.jsx';
 import Cart from './components/Cart.jsx';
 import Reservation from './components/Reservation.jsx';
+import Reservationlist from './components/admin/ReservationList.jsx';
  
  
  
@@ -36,7 +37,8 @@ const router = createBrowserRouter(
         <Route index element={<Navigate to="dashboard" />} /> {/* Redirect to dashboard */}
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="menu" element={<MenuManager />} />
-        <Route path="orders" element={<Orderlist />} />       
+        <Route path="orders" element={<Orderlist />} />   
+        <Route path="reservations" element={<Reservationlist />} />    
       </Route>
       
     </Route>
