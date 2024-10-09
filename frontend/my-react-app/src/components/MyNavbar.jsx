@@ -20,6 +20,14 @@ const MyNavbar = () => {
           <span className="navbar-toggler-icon"></span>
         </button>
         <div className="collapse navbar-collapse" id="navbarNav">
+          <ul className="navbar-nav me-auto">
+            <li className="nav-item d-flex align-items-center p-2">
+              <Link className='text-light' to="/">Menu</Link>
+            </li>
+            <li className="nav-item d-flex align-items-center p-2">
+              <Link className='text-light' to="/cart"><FaCartArrowDown /></Link>
+            </li>
+          </ul>
         </div>
       </div>
     </nav>
