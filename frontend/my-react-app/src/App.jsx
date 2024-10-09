@@ -17,6 +17,8 @@ import Layout from './components/admin/Layout.jsx'
 import Dashboard from './components/admin/Dashboard.jsx'
 import MenuManager from './components/admin/MenuManager.jsx';
 import Orderlist from './components/admin/Orderlist.jsx';
+import Cart from './components/Cart.jsx';
+ 
  
  
 
@@ -26,7 +28,7 @@ const router = createBrowserRouter(
   createRoutesFromElements(
     <Route>
       <Route path="/" element={<Menu />} />
- 
+      <Route path="/cart" element={<Cart />} />
       
       <Route path="admin" element={<Layout />}>
         <Route index element={<Navigate to="dashboard" />} /> {/* Redirect to dashboard */}
