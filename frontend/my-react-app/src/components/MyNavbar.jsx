@@ -25,6 +25,9 @@ const MyNavbar = () => {
               <Link className='text-light' to="/">Menu</Link>
             </li>
             <li className="nav-item d-flex align-items-center p-2">
+              <Link className='text-light' to="/reservation">Reservation</Link>
+            </li>
+            <li className="nav-item d-flex align-items-center p-2">
               <Link className='text-light' to="/cart"><FaCartArrowDown /></Link>
             </li>
           </ul>
