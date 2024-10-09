@@ -20,6 +20,7 @@ import Orderlist from './components/admin/Orderlist.jsx';
 import Cart from './components/Cart.jsx';
 import Reservation from './components/Reservation.jsx';
 import Reservationlist from './components/admin/ReservationList.jsx';
+import Inventory from './components/admin/Inventory.jsx';
  
  
  
@@ -39,6 +40,7 @@ const router = createBrowserRouter(
         <Route path="menu" element={<MenuManager />} />
         <Route path="orders" element={<Orderlist />} />   
         <Route path="reservations" element={<Reservationlist />} />    
+        <Route path="inventory" element={<Inventory />} />
       </Route>
       
     </Route>
