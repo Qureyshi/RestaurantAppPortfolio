@@ -47,7 +47,7 @@ const LoginForm = () => {
           <small>Don't have an account? <a href="#">Sign up</a></small>
         </div>
       </div>
-      <div className="col-6 bg-image">
+      <div className="col-6 bg-image-login">
         {/* You can add content here if needed */}
       </div>
     </div>

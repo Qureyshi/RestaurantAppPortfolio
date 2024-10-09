@@ -94,7 +94,7 @@ background-repeat: no-repeat;
 /* user login  */
 
 
-.bg-image {
+.bg-image-login {
 background-image: url('https://images.pexels.com/photos/845798/pexels-photo-845798.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'); /* Replace with your image URL */
 background-size: cover; /* Cover the entire div */
 background-position: center; /* Center the background image */
@@ -174,3 +174,40 @@ font-size: 18px;
   background-image: url(https://gramentheme.com/html/fresheat/assets/img/bg/breadcumb.jpg);;
 }
 
+
+
+/* register*/
+ 
+ 
+  
+.bg-image {
+  background-image: url('https://images.pexels.com/photos/6126926/pexels-photo-6126926.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'); /* Replace with your image URL */
+  background-size: cover;
+  background-position: center;
+  height: 100vh;
+}
+
+.shadow {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow for the form */
+}
+
+.rounded {
+  border-radius: 8px; /* Rounded corners for the form */
+}
+
+.card-title {
+  color: #343a40; /* Darker color for the title */
+}
+
+.btn-primary {
+  background-color: #007bff; /* Bootstrap primary color */
+  border-color: #007bff; /* Button border color */
+}
+
+.btn-primary:hover {
+  background-color: #0056b3; /* Darker shade on hover */
+}
+
+.form-control {
+  border-radius: 0.25rem; /* Rounded corners for input fields */
+}

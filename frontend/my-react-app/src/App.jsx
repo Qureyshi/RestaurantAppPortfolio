@@ -23,6 +23,7 @@ import Reservationlist from './components/admin/ReservationList.jsx';
 import Inventory from './components/admin/Inventory.jsx';
 import Admin from './components/admin/Admin.jsx';
 import LoginForm from './components/LoginForm.jsx';
+import Register from './components/Register.jsx';
  
  
  
@@ -37,6 +38,7 @@ const router = createBrowserRouter(
       <Route path="/reservation" element={<Reservation />} />
       <Route path="adminlogin" element={<Admin />} />
       <Route path="/loginform" element={<LoginForm />} />
+      <Route path="/register" element={<Register />} />
 
       <Route path="admin" element={<Layout />}>
         <Route index element={<Navigate to="dashboard" />} /> {/* Redirect to dashboard */}
