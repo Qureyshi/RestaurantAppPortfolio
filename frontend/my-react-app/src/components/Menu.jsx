@@ -65,7 +65,16 @@ const Menu = () => {
             <>    
             <div className="col-3" key={item.id}>
               <div className="rounded bg-light py-3 mt-5 d-flex flex-column align-items-center text-center">
-                  <img src="/images/food.jpg"  alt="Food"  className="rounded-circle"  style={{ width: '60%', height: 'auto' }} />
+                    <img 
+                        src={item.image} // Use the image field from the API response
+                        alt={item.title} // Update alt text to use the title
+                        className="rounded-circle"
+                        style={{
+                          width: '150px', // Set a fixed width
+                          height: '150px', // Set a fixed height
+                          objectFit: 'cover', // Ensures the image covers the entire box
+                        }}  
+                    />
                   <h4 className='mt-2'>{item.title}</h4>
                   <h6 className='mt-2 text-danger font-weight-bold'>${parseFloat(item.price).toFixed(2)}</h6>
                   <button className='btn btn-danger mt-2'>
