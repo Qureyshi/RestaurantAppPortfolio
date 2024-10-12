@@ -18,7 +18,7 @@ class MenuItemSerializer(serializers.ModelSerializer):
     # category = CategorySerializer(read_only=True)
     class Meta:
         model = MenuItem
-        fields = ['id', 'title', 'price', 'category', 'featured']
+        fields = ['id', 'title', 'price', 'category', 'featured', 'image']
 
 
 class CartSerializer(serializers.ModelSerializer):

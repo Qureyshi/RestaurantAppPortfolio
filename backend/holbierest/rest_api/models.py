@@ -15,7 +15,11 @@ class MenuItem(models.Model):
     price = models.DecimalField(max_digits=6, decimal_places=2, db_index=True)
     featured = models.BooleanField(db_index=True)
     category = models.ForeignKey(Category, on_delete=models.PROTECT)
+    image = models.ImageField(upload_to='menu_images/', default='default_image.jpg')
     
+    class Meta:
+        ordering = ['category']
+        
     def __str__(self):
         return self.title
 
