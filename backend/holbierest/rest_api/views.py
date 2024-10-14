@@ -1,6 +1,8 @@
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from .models import Category, MenuItem, Cart, Order, OrderItem
+from .paginations import CustomPagination
+from django_filters.rest_framework import DjangoFilterBackend
 from .serializers import CategorySerializer, MenuItemSerializer, CartSerializer, OrderSerializer, UserSerilializer
 from rest_framework.response import Response
 
@@ -23,10 +25,13 @@ class CategoriesView(generics.ListCreateAPIView):
             permission_classes = [IsAuthenticated]
 
         return [permission() for permission in permission_classes]
-
+    
 class MenuItemsView(generics.ListCreateAPIView):
     queryset = MenuItem.objects.all()
     serializer_class = MenuItemSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['category__title']  # Fields to filter on
+    #pagination_class = CustomPagination
     search_fields = ['title', 'category__title']
     ordering_fields = ['price', 'title', 'category__title']
 
