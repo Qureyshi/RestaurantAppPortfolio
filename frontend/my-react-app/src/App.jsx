@@ -24,6 +24,7 @@ import Inventory from './components/admin/Inventory.jsx';
 import Admin from './components/admin/Admin.jsx';
 import LoginForm from './components/LoginForm.jsx';
 import Register from './components/Register.jsx';
+import Home from './components/Home.jsx';
  
  
  
@@ -33,7 +34,8 @@ import Register from './components/Register.jsx';
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route>
-      <Route path="/" element={<Menu />} />
+      <Route path="/" element={<Home />} />
+      <Route path="/menu" element={<Menu />} />
       <Route path="/cart" element={<Cart />} />
       <Route path="/reservation" element={<Reservation />} />
       <Route path="adminlogin" element={<Admin />} />
