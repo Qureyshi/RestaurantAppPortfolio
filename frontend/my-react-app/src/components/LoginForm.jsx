@@ -1,13 +1,43 @@
 import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import Cookies from 'js-cookie'; // Import js-cookie
+import { useNavigate } from 'react-router-dom'; // Import useNavigate for navigation
 
 const LoginForm = () => {
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState(''); // State for username
+  const [password, setPassword] = useState(''); // State for password
+  const navigate = useNavigate(); // Initialize useNavigate hook
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Add logic to handle login submission here
-    console.log('Password entered:', password);
+
+    try {
+      const response = await fetch('http://localhost:8000/auth/token/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }), // Send username and password
+      });
+
+      if (!response.ok) {
+        throw new Error('Login failed!'); // Handle error response
+      }
+
+      const data = await response.json();
+      const token = data.auth_token; // Extract token from response
+
+      const expirationTime = new Date(Date.now() + 20 * 60 * 1000); // 2 minutes from now
+      Cookies.set('authToken', token, { expires: expirationTime });
+ 
+      console.log('Token stored in cookie:', token); // Log token for debugging
+
+      // Redirect the user to the home page after successful login
+      navigate('/'); // Change '/' to your home route if different
+    } catch (error) {
+      console.error(error);
+      // Optionally, show an error message to the user
+    }
   };
 
   return (
@@ -16,12 +46,14 @@ const LoginForm = () => {
         <h3 className="card-title text-center mb-4">Login</h3>
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
-            <label htmlFor="email" className="form-label">Email address</label>
+            <label htmlFor="username" className="form-label">Username</label>
             <input
-              type="email"
+              type="text"
               className="form-control"
-              id="email"
-              placeholder="Enter your email"
+              id="username"
+              placeholder="Enter your username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)} // Update username state
               required
             />
           </div>
