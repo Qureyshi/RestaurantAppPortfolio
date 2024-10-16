@@ -1,9 +1,18 @@
 import React from "react";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FaTrash } from 'react-icons/fa';
 import { FaCartArrowDown } from "react-icons/fa";
 
 const MyNavbar = () => {
+  const navigate = useNavigate();
+
+  // Function to clear the authToken cookie
+  const handleLogout = () => {
+    // Clear the authToken cookie by setting its expiry date to a past time
+    document.cookie = "authToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    navigate("/loginform"); // Redirect to the login page after logout
+  };
+
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
       <div className="container">
@@ -37,6 +46,10 @@ const MyNavbar = () => {
               <Link className='text-light' to="/cart"><FaCartArrowDown /></Link>
             </li>
           </ul>
+          {/* Add Logout Button */}
+          <button className="btn btn-outline-light" onClick={handleLogout}>
+            Logout
+          </button>
         </div>
       </div>
     </nav>
