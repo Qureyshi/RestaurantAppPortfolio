@@ -62,3 +62,15 @@ class OrderItem(models.Model):
     
     def __str__(self):
         return f'{self.menuitem.title} - order_id:{self.order}'
+    
+    from django.db import models
+
+class Reservation(models.Model):
+    date = models.DateField()
+    time = models.TimeField()
+    phone_number = models.CharField(max_length=15)
+    number_of_guests = models.PositiveIntegerField()
+    message = models.TextField(blank=True)
+
+    def __str__(self):
+        return f"Reservation on {self.date} at {self.time} for {self.number_of_guests} guests"

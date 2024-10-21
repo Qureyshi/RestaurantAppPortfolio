@@ -1,9 +1,10 @@
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
-from .models import Category, MenuItem, Cart, Order, OrderItem
+from .models import Category, MenuItem, Cart, Order, OrderItem, Reservation
 from .paginations import CustomPagination
+from .permissions import IsManagerMemberOrAdmin
 from django_filters.rest_framework import DjangoFilterBackend
-from .serializers import CategorySerializer, MenuItemSerializer, CartSerializer, OrderSerializer, UserSerilializer
+from .serializers import CategorySerializer, MenuItemSerializer, CartSerializer, OrderSerializer, UserSerilializer, ReservationSerializer
 from rest_framework.response import Response
 
 from rest_framework.permissions import IsAdminUser
@@ -181,3 +182,9 @@ class DeliveryCrewViewSet(viewsets.ViewSet):
         dc = Group.objects.get(name="Delivery Crew")
         dc.user_set.remove(user)
         return Response({"message": "user removed from the delivery crew group"}, 200)
+    
+
+class ReservationListCreateView(generics.ListCreateAPIView):
+    queryset = Reservation.objects.all()
+    serializer_class = ReservationSerializer
+    permission_classes = [IsAuthenticated, IsManagerMemberOrAdmin]
