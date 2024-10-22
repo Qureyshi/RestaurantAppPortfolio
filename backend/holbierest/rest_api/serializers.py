@@ -27,6 +27,7 @@ class CartSerializer(serializers.ModelSerializer):
         default=serializers.CurrentUserDefault()
     )
 
+    menuitem = MenuItemSerializer()  # Use MenuItemSerializer to include all fields
 
     def validate(self, attrs):
         attrs['price'] = attrs['quantity'] * attrs['unit_price']
