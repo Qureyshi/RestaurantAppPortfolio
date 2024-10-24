@@ -63,6 +63,23 @@ class CartView(generics.ListCreateAPIView):
     def get_queryset(self):
         return Cart.objects.all().filter(user=self.request.user)
 
+    def post(self, request, *args, **kwargs):
+        menuitem = get_object_or_404(MenuItem, id=request.data['menuitem_id'])
+        # Set quantity to 1 if not provided in the request
+        quantity = int(request.data.get('quantity', 1))
+        cart_item, created = Cart.objects.get_or_create(
+            user=self.request.user, menuitem=menuitem,
+            defaults={'quantity': quantity, 'unit_price': menuitem.price, 'price': menuitem.price * quantity}
+        )
+        if not created:
+            cart_item.quantity += quantity
+            cart_item.price = cart_item.quantity * cart_item.unit_price
+            cart_item.save()
+            return Response({'message': 'Item already exists, quantity updated'}, status.HTTP_200_OK)
+
+        return Response({'message': "Item added to Cart!"}, status.HTTP_201_CREATED)
+
+
     def delete(self, request, *args, **kwargs):
         Cart.objects.all().filter(user=self.request.user).delete()
         return Response("ok")
