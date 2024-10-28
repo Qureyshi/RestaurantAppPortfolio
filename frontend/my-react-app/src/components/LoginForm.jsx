@@ -27,7 +27,7 @@ const LoginForm = () => {
       const data = await response.json();
       const token = data.auth_token; // Extract token from response
 
-      const expirationTime = new Date(Date.now() + 20 * 60 * 1000); // 2 minutes from now
+      const expirationTime = new Date(Date.now() + 90 * 60 * 1000); // 2 minutes from now
       Cookies.set('authToken', token, { expires: expirationTime });
  
       console.log('Token stored in cookie:', token); // Log token for debugging

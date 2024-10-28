@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import CartItem from './CartItem';
 import { FaTrash } from 'react-icons/fa';
 import MyNavbar from './MyNavbar';
 import MyFooter from './MyFooter';
@@ -7,20 +6,18 @@ import MyFooter from './MyFooter';
 const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [orderError, setOrderError] = useState(null); // State for handling order errors
+  const [loadingItems, setLoadingItems] = useState({});
+  const [orderError, setOrderError] = useState(null);
 
   useEffect(() => {
     const fetchCartItems = async () => {
       const token = document.cookie.split('; ').find(row => row.startsWith('authToken='));
-
       if (!token) {
         console.error('No auth token found');
         setLoading(false);
         return;
       }
-
       const authToken = token.split('=')[1].trim();
-
       try {
         const response = await fetch('http://localhost:8000/api/cart/menu-items', {
           method: 'GET',
@@ -29,11 +26,9 @@ const Cart = () => {
             'Content-Type': 'application/json',
           },
         });
-
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-
         const cartData = await response.json();
         setCartItems(cartData.results);
       } catch (error) {
@@ -42,37 +37,70 @@ const Cart = () => {
         setLoading(false);
       }
     };
-
     fetchCartItems();
   }, []);
 
   const handleRemoveItem = (menuitemId) => {
     setCartItems(prevItems => prevItems.filter(item => item.menuitem.id !== menuitemId));
   };
-  
-  const updateQuantity = (menuitemId, newQuantity) => {
-    if (newQuantity < 1) {
-      handleRemoveItem(menuitemId); // Remove if quantity is less than 1
-    } else {
-      setCartItems(prevItems =>
-        prevItems.map(item =>
-          item.menuitem.id === menuitemId ? { ...item, quantity: newQuantity } : item
-        )
-      );
+
+  const updateQuantity = async (menuItemId, newQuantity, action) => {
+    if (loadingItems[menuItemId] || newQuantity < 1) return;
+
+    // Optimistically update the UI
+    setCartItems(prevItems =>
+      prevItems.map(item =>
+        item.menuitem.id === menuItemId ? { ...item, quantity: newQuantity } : item
+      )
+    );
+
+    setLoadingItems(prev => ({ ...prev, [menuItemId]: true }));
+
+    try {
+      const token = document.cookie.split('; ').find(row => row.startsWith('authToken='));
+      if (!token) {
+        console.error('No auth token found');
+        return;
+      }
+      
+      const updatedQuantity = action === 'increase' ? 1 : - 1;
+      const authToken = token.split('=')[1].trim();
+      const response = await fetch('http://localhost:8000/api/cart/menu-items', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Token ${authToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          menuitem_id: menuItemId,
+          quantity: updatedQuantity,
+        }),
+      });
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error updating item quantity:', errorText);
+        // Revert the UI change in case of error
+        setCartItems(prevItems =>
+          prevItems.map(item =>
+            item.menuitem.id === menuItemId ? { ...item, quantity: newQuantity === item.quantity ? 1 : item.quantity } : item
+          )
+        );
+      }
+    } catch (error) {
+      console.error('Error updating item quantity:', error);
+    } finally {
+      setLoadingItems(prev => ({ ...prev, [menuItemId]: false }));
     }
   };
 
   const handleOrder = async () => {
     setOrderError(null);
     const token = document.cookie.split('; ').find(row => row.startsWith('authToken='));
-
     if (!token) {
       console.error('No auth token found');
       return;
     }
-
     const authToken = token.split('=')[1].trim();
-
     try {
       const response = await fetch('http://localhost:8000/api/orders', {
         method: 'POST',
@@ -82,16 +110,12 @@ const Cart = () => {
         },
         body: JSON.stringify({}),
       });
-
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
       }
-
       const orderData = await response.json();
       console.log('Order created successfully:', orderData);
-
-      // Clear the cart after ordering
       setCartItems([]);
     } catch (error) {
       setOrderError(error.message);
@@ -118,9 +142,7 @@ const Cart = () => {
               <table className="table .table-borderless text-center">
                 <tbody>
                   {cartItems.map(item => {
-
                     const unitPrice = parseFloat(item.unit_price) || 0;
-
                     return (
                       <tr key={item.menuitem.id}>
                         <td className='p-5'>
@@ -129,9 +151,17 @@ const Cart = () => {
                         <td className='p-5'>{item.menuitem.title}</td>
                         <td className='p-5'>${unitPrice.toFixed(2)}</td>
                         <td className='p-5'>
-                          <button onClick={() => updateQuantity(item.menuitem.id, item.quantity - 1)} className="btn btn-secondary mx-2">-</button>
+                          <button 
+                            onClick={() => updateQuantity(item.menuitem.id, item.quantity - 1, 'decrease')} 
+                            className="btn btn-secondary mx-2"
+                            disabled={loadingItems[item.menuitem.id] || item.quantity <= 1}
+                          >-</button>
                           {item.quantity}
-                          <button onClick={() => updateQuantity(item.menuitem.id, item.quantity + 1)} className="btn btn-secondary mx-2">+</button>
+                          <button 
+                            onClick={() => updateQuantity(item.menuitem.id, item.quantity + 1, 'increase')} 
+                            className="btn btn-secondary mx-2"
+                            disabled={loadingItems[item.menuitem.id]}
+                          >+</button>
                         </td>
                         <td className='p-5'>${(unitPrice * item.quantity).toFixed(2)}</td>
                         <td className='p-5'>
@@ -147,8 +177,6 @@ const Cart = () => {
             </div>
           </div>
         )}
-
-        {/* Cart Totals */}
         <div className="row">
           <div className="col-md-3 offset-md-9">
             <table className="table">

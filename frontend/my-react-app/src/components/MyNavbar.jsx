@@ -46,6 +46,9 @@ const MyNavbar = () => {
               <Link className='text-light' to="/register">Register</Link>
             </li>
             <li className="nav-item p-2">
+              <Link className='text-light' to="/orders">Orders</Link>
+            </li>
+            <li className="nav-item p-2">
               <Link className='text-light' to="/cart"><FaCartArrowDown /></Link>
             </li>
           </ul>

@@ -56,7 +56,7 @@ const Register = () => {
       console.log('User logged in successfully:', auth_token);
       
       // Step 3: Store the token in a cookie
-      const expirationTime = new Date(Date.now() + 20 * 60 * 1000); // 2 minutes from now
+      const expirationTime = new Date(Date.now() + 90 * 60 * 1000); // 2 minutes from now
       Cookies.set('authToken', auth_token, { expires: expirationTime });
       navigate('/');
   // Set cookie to expire in 7 days

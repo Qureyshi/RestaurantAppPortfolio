@@ -25,6 +25,7 @@ import Admin from './components/admin/Admin.jsx';
 import LoginForm from './components/LoginForm.jsx';
 import Register from './components/Register.jsx';
 import Home from './components/Home.jsx';
+import Orders from './components/Orders.jsx';
  
  
  
@@ -41,6 +42,7 @@ const router = createBrowserRouter(
       <Route path="adminlogin" element={<Admin />} />
       <Route path="/loginform" element={<LoginForm />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/orders" element={<Orders />} />
 
       <Route path="admin" element={<Layout />}>
         <Route index element={<Navigate to="dashboard" />} /> {/* Redirect to dashboard */}
