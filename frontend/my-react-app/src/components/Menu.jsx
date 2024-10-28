@@ -75,43 +75,40 @@ const Menu = () => {
   };
 
   // Handle adding item to cart
-  const handleAddToCart = async (item) => {
-    const token = getAuthToken(); // Retrieve the token
-
-    if (!token) {
-      alert("You need to log in to add items to the cart.");
-      return;
-    }
-
-    const data = {
-      menuitem: item.id, // Assuming item.id corresponds to the menu item ID
-      unit_price: item.price,
-      quantity: 1, // You can change this to get user input
-      price: item.price,
-    };
-
+  const handleAddToCart = async (menuItemId, quantity) => {
     try {
+      const token = document.cookie.split('; ').find(row => row.startsWith('authToken='));
+      if (!token) {
+        console.error('No auth token found');
+        return;
+      }
+      const authToken = token.split('=')[1].trim();
+
       const response = await fetch('http://localhost:8000/api/cart/menu-items', {
         method: 'POST',
         headers: {
+          'Authorization': `Token ${authToken}`,
           'Content-Type': 'application/json',
-          'Authorization': `Token ${token}`, // Include the token in the headers
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          menuitem_id: menuItemId,
+          quantity: quantity,
+        }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to add item to cart');
+        const errorText = await response.text();
+        console.error('Error adding item to cart:', errorText);
+        return;
       }
 
-      const result = await response.json();
-      console.log('Item added to cart:', result);
-      // Optionally update UI or notify the user
-    } catch (err) {
-      console.error(err);
-      alert(err.message);
+      const data = await response.json();
+      console.log('Item added to cart:', data);
+      setCartItems(prevItems => [...prevItems, data]); // Update UI if needed
+    } catch (error) {
+      console.error('Error adding item to cart:', error);
     }
-  };
+  };  
 
   if (loadingCategories || loadingMenu) {
     return <div>Loading...</div>;
@@ -160,7 +157,7 @@ const Menu = () => {
                 </h6>
                 <button 
                   className="btn btn-danger mt-2" 
-                  onClick={() => handleAddToCart(item)} // Pass the item to the handler
+                  onClick={() => handleAddToCart(item.id, 1)} // Pass the item to the handler
                 >
                   Add to cart
                 </button>

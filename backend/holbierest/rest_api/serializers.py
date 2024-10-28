@@ -50,6 +50,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
 class OrderSerializer(serializers.ModelSerializer):
 
     orderitem = OrderItemSerializer(many=True, read_only=True, source='order')
+    date = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", read_only=True)
 
     class Meta:
         model = Order

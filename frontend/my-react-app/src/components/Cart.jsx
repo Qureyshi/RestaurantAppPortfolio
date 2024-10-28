@@ -1,25 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { FaTrash } from 'react-icons/fa'; // For the trash icon
+import { FaTrash } from 'react-icons/fa';
 import MyNavbar from './MyNavbar';
 import MyFooter from './MyFooter';
 
 const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
-  const [loading, setLoading] = useState(true); // State to manage loading
+  const [loading, setLoading] = useState(true);
+  const [orderError, setOrderError] = useState(null); // State for handling order errors
 
   useEffect(() => {
     const fetchCartItems = async () => {
-      // Retrieve the auth token from cookies
       const token = document.cookie.split('; ').find(row => row.startsWith('authToken='));
 
       if (!token) {
         console.error('No auth token found');
         setLoading(false);
-        return; // Exit if no token is found
+        return;
       }
 
-      const authToken = token.split('=')[1].trim(); // Trim any whitespace
-      console.log('Auth Token:', authToken); // Log the token for verification
+      const authToken = token.split('=')[1].trim();
 
       try {
         const response = await fetch('http://localhost:8000/api/cart/menu-items', {
@@ -31,38 +30,11 @@ const Cart = () => {
         });
 
         if (!response.ok) {
-          const errorText = await response.text(); // Get response text for more information
-          console.error('Error fetching cart items:', errorText); // Log error details
-          throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
 
         const cartData = await response.json();
-        console.log('Fetched Cart Items:', cartData.results); // Log the fetched data
-
-        // Fetch menu details for each cart item
-        const itemsWithDetails = await Promise.all(cartData.results.map(async item => {
-          try {
-            const menuResponse = await fetch(`http://localhost:8000/api/menu-items/${item.menuitem}`);
-            if (!menuResponse.ok) {
-              throw new Error(`Error fetching menu item ${item.menuitem}: ${menuResponse.status}`);
-            }
-
-            const menuItem = await menuResponse.json();
-            return {
-              id: item.menuitem, // Assuming menuitem is the ID
-              name: menuItem.title, // Get the title from the menu item
-              img: menuItem.image, // Get the image URL from the menu item
-              price: parseFloat(menuItem.price), // Convert price to float
-              quantity: item.quantity, // Keep track of quantity
-            };
-          } catch (error) {
-            console.error('Error fetching menu item details:', error);
-            return null; // In case of error, return null to filter out later
-          }
-        }));
-
-        // Filter out any null values in case of errors
-        setCartItems(itemsWithDetails.filter(item => item !== null));
+        setCartItems(cartData.results);
       } catch (error) {
         console.error('Error fetching cart items:', error);
       } finally {
@@ -71,21 +43,46 @@ const Cart = () => {
     };
 
     fetchCartItems();
-  }, []); // Empty dependency array to run once on mount
+  }, []);
 
-  const handleQuantityChange = (id, delta) => {
-    setCartItems(prevItems =>
-      prevItems.map(item =>
-        item.id === id ? { ...item, quantity: Math.max(1, item.quantity + delta) } : item
-      )
-    );
+  const handleOrder = async () => {
+    setOrderError(null);
+    const token = document.cookie.split('; ').find(row => row.startsWith('authToken='));
+
+    if (!token) {
+      console.error('No auth token found');
+      return;
+    }
+
+    const authToken = token.split('=')[1].trim();
+
+    try {
+      const response = await fetch('http://localhost:8000/api/orders', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Token ${authToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({}),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+      }
+
+      const orderData = await response.json();
+      console.log('Order created successfully:', orderData);
+
+      // Clear the cart after ordering
+      setCartItems([]);
+    } catch (error) {
+      setOrderError(error.message);
+      console.error('Error creating order:', error);
+    }
   };
 
-  const handleRemoveItem = id => {
-    setCartItems(prevItems => prevItems.filter(item => item.id !== id));
-  };
-
-  const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  const subtotal = cartItems.reduce((acc, item) => acc + item.unit_price * item.quantity, 0);
 
   return (
     <>
@@ -96,33 +93,34 @@ const Cart = () => {
         </div>
       </div>
       <div className="container my-5">
-        {loading ? ( // Show loading state
+        {loading ? (
           <div className="text-center">Loading...</div>
         ) : (
           <div className="row">
             <div className="col-12">
               <table className="table .table-borderless text-center">
                 <tbody>
-                  {cartItems.map(item => (
-                    <tr key={item.id}>
-                      <td className='p-5'>
-                        <img src={item.img} alt={item.name} style={{ width: '100px', height: '100px', borderRadius: '50%' }} />
-                      </td>
-                      <td className='p-5'>{item.name}</td>
-                      <td className='p-5'>${item.price.toFixed(2)}</td>
-                      <td className='p-5'>
-                        <button className="btn btn-light" onClick={() => handleQuantityChange(item.id, -1)}>-</button>
-                        <span className="mx-2">{item.quantity}</span>
-                        <button className="btn btn-light" onClick={() => handleQuantityChange(item.id, 1)}>+</button>
-                      </td>
-                      <td className='p-5'>${(item.price * item.quantity).toFixed(2)}</td>
-                      <td className='p-5'>
-                        <button className="btn btn-danger" onClick={() => handleRemoveItem(item.id)}>
-                          <FaTrash />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
+                  {cartItems.map(item => {
+
+                    const unitPrice = parseFloat(item.unit_price) || 0;
+
+                    return (
+                      <tr key={item.menuitem.id}>
+                        <td className='p-5'>
+                          <img src={item.menuitem.image} alt={item.menuitem.title} style={{ width: '100px', height: '100px', borderRadius: '50%' }} />
+                        </td>
+                        <td className='p-5'>{item.menuitem.title}</td>
+                        <td className='p-5'>${unitPrice.toFixed(2)}</td>
+                        <td className='p-5'>{item.quantity}</td>
+                        <td className='p-5'>${(unitPrice * item.quantity).toFixed(2)}</td>
+                        <td className='p-5'>
+                          <button className="btn btn-danger" onClick={() => handleRemoveItem(item.menuitem.id)}>
+                            <FaTrash />
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -144,7 +142,8 @@ const Cart = () => {
                 </tr>
               </tbody>
             </table>
-            <button className="btn btn-danger w-100">Order</button>
+            <button className="btn btn-danger w-100" onClick={handleOrder}>Order</button>
+            {orderError && <div className="text-danger mt-2">{orderError}</div>}
           </div>
         </div>
       </div>

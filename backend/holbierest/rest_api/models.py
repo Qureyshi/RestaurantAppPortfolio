@@ -44,7 +44,7 @@ class Order(models.Model):
         User, on_delete=models.SET_NULL, related_name="delivery_crew", null=True)
     status = models.BooleanField(default=0, db_index=True)
     total = models.DecimalField(max_digits=6, decimal_places=2, default=0)
-    date = models.DateField(db_index=True)
+    date = models.DateTimeField(auto_now_add=True)  # Use DateTimeField
     
     def __str__(self):
         return f'username:{self.user.username} order_id{self.id}'

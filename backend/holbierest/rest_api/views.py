@@ -9,6 +9,7 @@ from rest_framework.response import Response
 
 from rest_framework.permissions import IsAdminUser
 from django.shortcuts import  get_object_or_404
+from django.utils import timezone
 
 from django.contrib.auth.models import Group, User
 
@@ -111,26 +112,30 @@ class OrderView(generics.ListCreateAPIView):
         total = self.get_total_price(self.request.user)
         data['total'] = total
         data['user'] = self.request.user.id
+        data['date'] = timezone.now()  # Set the current date and time
         order_serializer = OrderSerializer(data=data)
-        if (order_serializer.is_valid()):
+        
+        if order_serializer.is_valid():
             order = order_serializer.save()
 
-            items = Cart.objects.all().filter(user=self.request.user).all()
-
-            for item in items.values():
-                orderitem = OrderItem(
+            items = Cart.objects.filter(user=self.request.user)
+            for item in items:
+                OrderItem.objects.create(
                     order=order,
-                    menuitem_id=item['menuitem_id'],
-                    price=item['price'],
-                    quantity=item['quantity'],
+                    menuitem=item.menuitem,
+                    price=item.price,
+                    quantity=item.quantity
                 )
-                orderitem.save()
 
-            Cart.objects.all().filter(user=self.request.user).delete() #Delete cart items
+            # Clear the cart after creating the order
+            items.delete()
 
-            result = order_serializer.data.copy()
+            result = order_serializer.data
             result['total'] = total
-            return Response(order_serializer.data)
+            return Response(result, status=status.HTTP_201_CREATED)
+
+        # If the serializer is not valid, return an error response
+        return Response(order_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     def get_total_price(self, user):
         total = 0
