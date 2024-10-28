@@ -84,6 +84,42 @@ class CartView(generics.ListCreateAPIView):
     def delete(self, request, *args, **kwargs):
         Cart.objects.all().filter(user=self.request.user).delete()
         return Response("ok")
+    
+    # New method to handle PUT requests for updating quantity
+class SingleCartItemView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Cart.objects.all()
+    serializer_class = CartSerializer
+
+    def get_permissions(self):
+        permission_classes = []
+        if self.request.method != 'GET':
+            permission_classes = [IsAuthenticated]
+
+        return [permission() for permission in permission_classes]
+    
+    def put(self, request, menuitem_id, *args, **kwargs):
+        cart_item = get_object_or_404(Cart, user=self.request.user, menuitem__id=menuitem_id)
+        new_quantity = int(request.data.get('quantity', cart_item.quantity))
+        
+        if new_quantity < 1:
+            cart_item.delete()
+            return Response({'message': 'Item removed from cart'}, status=status.HTTP_204_NO_CONTENT)
+        
+        cart_item.quantity = new_quantity
+        cart_item.price = cart_item.unit_price * new_quantity
+        cart_item.save()
+
+        return Response(CartSerializer(cart_item).data, status=status.HTTP_200_OK)
+
+    # New method to handle DELETE requests for a single cart item
+    def delete_item(self, request, *args, **kwargs):
+        menuitem_id = kwargs.get('menuitem_id')
+        cart_item = get_object_or_404(Cart, user=self.request.user, menuitem_id=menuitem_id)
+
+        # Delete the cart item
+        cart_item.delete()
+
+        return Response({"message": "Cart item deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
 
 
 class OrderView(generics.ListCreateAPIView):

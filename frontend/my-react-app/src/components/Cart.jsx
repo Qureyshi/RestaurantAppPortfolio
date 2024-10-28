@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import CartItem from './CartItem';
 import { FaTrash } from 'react-icons/fa';
 import MyNavbar from './MyNavbar';
 import MyFooter from './MyFooter';
@@ -44,6 +45,22 @@ const Cart = () => {
 
     fetchCartItems();
   }, []);
+
+  const handleRemoveItem = (menuitemId) => {
+    setCartItems(prevItems => prevItems.filter(item => item.menuitem.id !== menuitemId));
+  };
+  
+  const updateQuantity = (menuitemId, newQuantity) => {
+    if (newQuantity < 1) {
+      handleRemoveItem(menuitemId); // Remove if quantity is less than 1
+    } else {
+      setCartItems(prevItems =>
+        prevItems.map(item =>
+          item.menuitem.id === menuitemId ? { ...item, quantity: newQuantity } : item
+        )
+      );
+    }
+  };
 
   const handleOrder = async () => {
     setOrderError(null);
@@ -111,7 +128,11 @@ const Cart = () => {
                         </td>
                         <td className='p-5'>{item.menuitem.title}</td>
                         <td className='p-5'>${unitPrice.toFixed(2)}</td>
-                        <td className='p-5'>{item.quantity}</td>
+                        <td className='p-5'>
+                          <button onClick={() => updateQuantity(item.menuitem.id, item.quantity - 1)} className="btn btn-secondary mx-2">-</button>
+                          {item.quantity}
+                          <button onClick={() => updateQuantity(item.menuitem.id, item.quantity + 1)} className="btn btn-secondary mx-2">+</button>
+                        </td>
                         <td className='p-5'>${(unitPrice * item.quantity).toFixed(2)}</td>
                         <td className='p-5'>
                           <button className="btn btn-danger" onClick={() => handleRemoveItem(item.menuitem.id)}>
