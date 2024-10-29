@@ -1,10 +1,10 @@
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
-from .models import Category, MenuItem, Cart, Order, OrderItem, Reservation
+from .models import Category, MenuItem, Cart, Order, OrderItem, Reservation, Review
 from .paginations import CustomPagination
 from .permissions import IsManagerMemberOrAdmin
 from django_filters.rest_framework import DjangoFilterBackend
-from .serializers import CategorySerializer, MenuItemSerializer, CartSerializer, OrderSerializer, UserSerilializer, ReservationSerializer
+from .serializers import CategorySerializer, MenuItemSerializer, CartSerializer, OrderSerializer, UserSerilializer, ReservationSerializer, ReviewSerializer
 from rest_framework.response import Response
 
 from rest_framework.permissions import IsAdminUser
@@ -246,3 +246,16 @@ class ReservationListCreateView(generics.ListCreateAPIView):
     queryset = Reservation.objects.all()
     serializer_class = ReservationSerializer
     permission_classes = [IsAuthenticated, IsManagerMemberOrAdmin]
+
+
+class ReviewListCreateView(generics.ListCreateAPIView):
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        menu_item_id = self.kwargs['menu_item_id']
+        return Review.objects.filter(menu_item_id=menu_item_id)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
