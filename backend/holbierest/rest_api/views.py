@@ -112,10 +112,8 @@ class SingleCartItemView(generics.RetrieveUpdateDestroyAPIView):
         return Response(CartSerializer(cart_item).data, status=status.HTTP_200_OK)
 
     # New method to handle DELETE requests for a single cart item
-    def delete_item(self, request, *args, **kwargs):
-        menuitem_id = kwargs.get('menuitem_id')
+    def delete(self, request, menuitem_id, *args, **kwargs):        
         cart_item = get_object_or_404(Cart, user=self.request.user, menuitem_id=menuitem_id)
-
         # Delete the cart item
         cart_item.delete()
 

@@ -6,7 +6,7 @@ urlpatterns = [
     path('menu-items', views.MenuItemsView.as_view()),
     path('menu-items/<int:pk>', views.SingleMenuItemView.as_view()),
     path('cart/menu-items', views.CartView.as_view()),
-    path('cart/menu-items/<int:pk>/', views.SingleCartItemView.as_view()),
+    path('cart/menu-items/<int:menuitem_id>/', views.SingleCartItemView.as_view(), name='single-cart-item'),
     path('orders', views.OrderView.as_view()),
     path('orders/<int:pk>', views.SingleOrderView.as_view()),
     path('reservations/', views.ReservationListCreateView.as_view()),
