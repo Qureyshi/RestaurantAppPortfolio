@@ -4,7 +4,7 @@ from .models import Category, MenuItem, Cart, Order, OrderItem, Reservation, Rev
 from .paginations import CustomPagination
 from .permissions import IsManagerMemberOrAdmin
 from django_filters.rest_framework import DjangoFilterBackend
-from .serializers import CategorySerializer, MenuItemSerializer, CartSerializer, OrderSerializer, UserSerilializer, ReservationSerializer, ReviewSerializer
+from .serializers import CategorySerializer, MenuItemSerializer, CartSerializer, OrderSerializer, CustomUserSerializer, ReservationSerializer, ReviewSerializer
 from rest_framework.response import Response
 
 from rest_framework.permissions import IsAdminUser
@@ -185,10 +185,19 @@ class SingleOrderView(generics.RetrieveUpdateAPIView):
     permission_classes = [IsAuthenticated]
 
     def update(self, request, *args, **kwargs):
-        if self.request.user.groups.count()==0: # Normal user, not belonging to any group = Customer
-            return Response('Not Ok')
-        else: #everyone else - Super Admin, Manager and Delivery Crew
-            return super().update(request, *args, **kwargs)
+        # Check if the user belongs to a group
+        if self.request.user.groups.count() == 0 and not self.request.user.is_superuser:  # Normal user, not belonging to any group = Customer
+            return Response({'error': 'Not authorized to update order status.'}, status=status.HTTP_403_FORBIDDEN)
+
+        # Extract the new status from the request data
+        new_status = request.data.get('status')        
+
+        order = self.get_object()
+        order.status = new_status
+        order.save()
+
+        serializer = self.get_serializer(order)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 
@@ -196,7 +205,7 @@ class GroupViewSet(viewsets.ViewSet):
     permission_classes = [IsAdminUser]
     def list(self, request):
         users = User.objects.all().filter(groups__name='Manager')
-        items = UserSerilializer(users, many=True)
+        items = CustomUserSerializer(users, many=True)
         return Response(items.data)
 
     def create(self, request):
@@ -215,7 +224,7 @@ class DeliveryCrewViewSet(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
     def list(self, request):
         users = User.objects.all().filter(groups__name='Delivery Crew')
-        items = UserSerilializer(users, many=True)
+        items = CustomUserSerializer(users, many=True)
         return Response(items.data)
 
     def create(self, request):

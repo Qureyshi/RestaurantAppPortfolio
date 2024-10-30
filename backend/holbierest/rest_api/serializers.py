@@ -1,9 +1,15 @@
 from rest_framework import serializers
+from djoser.serializers import UserSerializer as DjoserUserSerializer
 from django.contrib.auth.models import User
 from decimal import Decimal
 
 from .models import Category, MenuItem, Cart, Order, OrderItem, Reservation, Review
 
+
+class CustomUserSerializer(DjoserUserSerializer):
+    class Meta:
+        model = User
+        fields = ('id', 'username', 'email', 'is_staff', 'groups')
 
 class CategorySerializer (serializers.ModelSerializer):
     class Meta:
@@ -42,6 +48,8 @@ class CartSerializer(serializers.ModelSerializer):
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
+    menuitem = MenuItemSerializer()  # Use MenuItemSerializer to include all fields
+    
     class Meta:
         model = OrderItem
         fields = ['order', 'menuitem', 'quantity', 'price']
@@ -49,6 +57,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
 class OrderSerializer(serializers.ModelSerializer):
 
+    #user = CustomUserSerializer()
     orderitem = OrderItemSerializer(many=True, read_only=True, source='order')
     date = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", read_only=True)
 
@@ -57,11 +66,6 @@ class OrderSerializer(serializers.ModelSerializer):
         fields = ['id', 'user', 'delivery_crew',
                   'status', 'date', 'total', 'orderitem']
 
-
-class UserSerilializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ['id','username','email']
 
 
 class ReviewSerializer(serializers.ModelSerializer):

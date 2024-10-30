@@ -50,10 +50,16 @@ class Cart(models.Model):
 
 
 class Order(models.Model):
+    STATUS_CHOICES = [
+        ('READY', 'Ready'),
+        ('DELIVERED', 'Delivered'),
+        ('PENDING', 'Pending'),
+        ('CANCELLED', 'Cancelled'),
+    ]
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     delivery_crew = models.ForeignKey(
         User, on_delete=models.SET_NULL, related_name="delivery_crew", null=True)
-    status = models.BooleanField(default=0, db_index=True)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='PENDING')
     total = models.DecimalField(max_digits=6, decimal_places=2, default=0)
     date = models.DateTimeField(auto_now_add=True)  # Use DateTimeField
     
