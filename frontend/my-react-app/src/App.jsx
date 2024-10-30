@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React, { useEffect } from 'react';
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
@@ -10,7 +10,8 @@ import {
   Routes,
   Navigate
 } from "react-router-dom";
-
+import AOS from 'aos';
+import 'aos/dist/aos.css';
 
 import Menu from './components/Menu.jsx'
 import Layout from './components/admin/Layout.jsx'
@@ -59,6 +60,14 @@ const router = createBrowserRouter(
 
 
 function App() {
+
+    useEffect(() => {
+      AOS.init({ duration: 1000 }); // 1000ms = 1s
+    }, []);
+  
+
+
+
   return (
  
     <>

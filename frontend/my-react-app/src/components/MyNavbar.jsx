@@ -17,7 +17,7 @@ const MyNavbar = () => {
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
       <div className="container d-flex justify-content-between">
         {/* Left side - RMS logo */}
-        <Link className='navbar-brand text-light h1' to="/">Rms</Link>
+        <Link className='navbar-brand text-light' to="/"><h1>RMS</h1></Link>
         <button
           className="navbar-toggler"
           type="button"
