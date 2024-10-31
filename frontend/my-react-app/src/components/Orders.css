@@ -1,0 +1,34 @@
+/* Ensure the content wrapper fills the entire viewport height */
+.content-wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  
+  /* Main content should expand to push the footer to the bottom */
+  main {
+    flex: 1;
+  }
+  
+  /* Footer styling to always appear at the bottom */
+  footer {
+    background-color: #f8f9fa;
+    padding: 20px;
+    text-align: center;
+    color: #6c757d;
+  }
+  
+  /* Table styling for better readability and responsiveness */
+  .table {
+    width: 100%;
+    margin-bottom: 1rem;
+    background-color: transparent;
+    font-size: 0.95rem;
+  }
+  
+  @media (max-width: 768px) {
+    .table {
+      font-size: 0.85rem;
+    }
+  }
+  

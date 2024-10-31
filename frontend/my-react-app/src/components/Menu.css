@@ -1,0 +1,40 @@
+.container-fluid.orders {
+    background-color: #f8f9fa;
+  }
+  
+  .menu-item {
+    transition: transform 0.3s ease;
+  }
+  
+  .menu-item:hover {
+    transform: scale(1.05);
+  }
+  
+  .menu-item-image {
+    width: 60%;
+    height: auto;
+  }
+  
+  .pagination-controls .btn {
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .pagination-controls .btn-danger {
+    color: white;
+  }
+  
+  @media (max-width: 768px) {
+    .menu-item-image {
+      width: 80%;
+    }
+  
+    .pagination-controls .btn {
+      width: 35px;
+      height: 35px;
+    }
+  }
+  
