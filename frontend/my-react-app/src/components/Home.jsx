@@ -7,65 +7,207 @@ const Home = () => {
     <>
       <MyNavbar />
       
-      <header className="bg-dark  text-white text-center py-5" style={{backgroundImage: 'url("https://images.pexels.com/photos/262978/pexels-photo-262978.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1")', backgroundSize: 'cover'}}>
-        <div className="container py-5">
-          <h1 className="display-4 mt-5">Welcome to Our Restaurant</h1>
-          <p className="lead">Experience the finest dining in the city</p>
-          <a href="#menu" className="btn btn-danger m-4">View Our Menu</a>
+      <header className="bg-dark  text-white  py-5  d-flex justify-content-center align-items-center " 
+      style={{
+        backgroundImage: `url('images/hero-bg.jpg')`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        height: '90vh', // Adjust as needed
+      }}
+      
+      
+      >
+
+        
+        <div className="container" >
+          <div className="row">
+            <div className="col-6 d-flex justify-content-center align-items-center">
+              <div data-aos="fade-left">
+              <h4 className="text-danger fw-bold">Experience the finest dining in the city</h4>
+              <h1 className="font-60 fw-bold">Welcome to Our Restaurant</h1>
+              
+              <a href="#menu" className="btn btn-danger mt-4">View Our Menu</a>
+              </div>
+            </div>
+            <div className="col-6" data-aos="fade-up">
+              <img src="images/chiken.png" alt="" />
+            </div>
+          </div>
+          
         </div>
+        
       </header>
 
   
 
-      <section className="py-5 bg-dark text-white text-center">
-      <div className="container">
-        <h2 className="mb-5">Discover Our Menu</h2>
-        <div className="row">
-          <div className="col-md-4">
-            <div className="card bg-dark text-white">
-              <img src="https://images.pexels.com/photos/660282/pexels-photo-660282.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" className="card-img-top" alt="Breakfast" />
-              <div className="card-body">
-                <h5>Breakfast</h5>
-                <ul className="list-unstyled">
-                  <li>Breakfast Casserole - $20</li>
-                  <li>Greek Yogurt - $15</li>
-                  <li>Cottage Cheese - $18</li>
-                </ul>
-                <a href="#" className="btn btn-danger mt-3">Make Order</a>
-              </div>
-            </div>
-          </div>
-          <div className="col-md-4">
-            <div className="card bg-dark text-white">
-              <img src="https://images.pexels.com/photos/660282/pexels-photo-660282.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" className="card-img-top" alt="Lunch" />
-              <div className="card-body">
-                <h5>Lunch</h5>
-                <ul className="list-unstyled">
-                  <li>Buffalo Chicken Grain - $20</li>
-                  <li>Creamy Rotisserie - $15</li>
-                  <li>Veggie Mason - $18</li>
-                </ul>
-                <a href="#" className="btn btn-danger mt-3">Make Order</a>
-              </div>
-            </div>
-          </div>
-          <div className="col-md-4">
-            <div className="card bg-dark text-white">
-              <img src="https://images.pexels.com/photos/660282/pexels-photo-660282.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" className="card-img-top" alt="Dinner" />
-              <div className="card-body">
-                <h5>Dinner</h5>
-                <ul className="list-unstyled">
-                  <li>Fried Chicken - $20</li>
-                  <li>Pizza - $15</li>
-                  <li>Tossed Salad - $18</li>
-                </ul>
-                <a href="#" className="btn btn-danger mt-3">Make Order</a>
-              </div>
-            </div>
+
+
+
+  <div className="container py-5">
+    <div className='row'>
+      <div className="col-4">
+        <div className="bg-success d-flex align-items-center justify-content-center  h-100 py-3" data-aos="zoom-in">
+          <div>
+            <h4 className='text-center text-white fw-bold'>FRIDAY SPECIAL</h4>
+            <h1 className='text-center text-warning fw-bold'> TASTY BURGER</h1>
+            <img src="https://foodking-react.vercel.app/assets/img/food/main-food.png" alt="Tasty Burger" class="img-fluid" />
           </div>
         </div>
       </div>
+      <div className=" row col-8">
+        <div className="col-6 ">
+          <div className="bg-danger h-100 d-flex align-items-center" data-aos="zoom-in" >
+            <img src="https://swigo.dexignzone.com/xhtml/assets/images/adv/pic3.png" alt="" />
+            <div>
+              <h3 className='text-white fw-bold'>TODAY SPECIAL</h3>
+              <h1 className='text-white fw-bold'>NODELS</h1>
+              <h2 className='text-warning fw-bold'>60% OFF</h2>
+              <a href="" className='btn btn-light'>Add To Cart</a>
+            </div>
+          </div>
+        </div>
+        <div className="col-6 ">
+          <div className="bg-warning h-100 d-flex align-items-center" data-aos="zoom-in">
+            <img src="images/burger-2.png" alt="" />
+            <div>
+              <h3 className='text-white fw-bold'>MUSHROOM</h3>
+              <h1 className='text-white fw-bold'>BURGER</h1>
+              <a href="" className='btn btn-light'>Add To Cart</a>
+            </div>
+          </div>
+        </div>
+        <div className="col-12 mt-4">
+          <div>
+            <div className="bg-dark position-relative p-5" data-aos="zoom-in">
+             
+              <h1 className='text-white fw-bold'>35% Offer</h1>
+              <h6 className='text-white fw-bold'>FOR LIMITED TIME ONLY</h6>
+             
+             <img src="images/pic4.png" alt=""  className='banner-img-4'/>
+            </div>
+ 
+          </div>
+        </div>
+
+
+
+
+
+
+
+
+
+      </div>
+      
+
+
+    </div>
+
+  </div>
+
+
+
+
+
+
+
+
+
+
+  <section>
+      <div className="">
+        <div className="row">
+          <div className="col-4 p-5"     style={{ backgroundImage: `url('images/food-bg.jpg')`, backgroundSize: 'cover', backgroundPosition: 'center'}} >
+            <p className='text-warning fw-bold'>START PRICE 25$</p>
+            <h1 className='text-white fw-bold'>DELICIOUS <br/> HAMBURGER <br/> FRIES</h1>
+            <a href="" className='btn btn-danger'>ORDER NOW</a>
+          </div>
+          <div className="col-4 p-5"     style={{ backgroundImage: `url('images/food-bg-2.jpg')`, backgroundSize: 'cover', backgroundPosition: 'center'}} >
+            <p className='text-warning fw-bold'>START PRICE 25$</p>
+            <h1 className='text-white fw-bold'>DELICIOUS <br/> HAMBURGER <br/> FRIES</h1>
+            <a href="" className='btn btn-danger'>ORDER NOW</a>
+          </div>
+          <div className="col-4 p-5"     style={{ backgroundImage: `url('images/food-bg-3.jpg')`, backgroundSize: 'cover', backgroundPosition: 'center'}} >
+            <p className='text-warning fw-bold'>START PRICE 25$</p>
+            <h1 className='text-white fw-bold'>DELICIOUS <br/> HAMBURGER <br/> FRIES</h1>
+            <a href="" className='btn btn-danger'>ORDER NOW</a>
+          </div>
+        
+        </div>
+      </div>
+
+
+
+  </section>
+
+
+
+
+
+  
+  <section className="py-5 bg-light d-flex align-items-center" style={{ minHeight: '300px' }}>
+      <div className="container d-flex justify-content-between align-items-center">
+        <div>
+          <h1 className="display-4">Experience of Real Recipes Taste</h1>
+          <div className="d-flex mt-4">
+            <div className="me-5">
+              <h2>98K</h2>
+              <p>Daily Orders</p>
+            </div>
+            <div>
+              <h2>5+</h2>
+              <p>Menu & Dish</p>
+            </div>
+          </div>
+        </div>
+        <div>
+          <img src="https://images.pexels.com/photos/2159065/pexels-photo-2159065.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="Salmon Dish" className="img-fluid" />
+        </div>
+      </div>
     </section>
+
+
+
+
+
+
+    <div className="bg-dark  text-white  py-5  d-flex justify-content-center align-items-center " 
+      style={{
+        backgroundImage: `url('images/main-bg.jpg')`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+       
+      }}
+        
+      
+      >
+        <div className="container">
+          <div className="row">
+            <div className="col-6 d-flex justify-content-center align-items-center">
+              <div>
+              <h4>SAVE 20 %</h4>
+              <h2>TODAY'S ASTACKIN DAY</h2>
+              <h3 className='mb-4'>grilled chiken$59,00</h3>
+              <a href="#menu" className="btn btn-danger">ORDER NOW</a>
+              </div>
+            </div>
+            <div className="col-6">
+            <img src="images/grilled.png" alt="" style={{ width: '100%' }} />
+
+            </div>
+          </div>
+        </div>
+
+
+      </div>
+
+
+
+
+
+
+
+
 
 
 
@@ -112,30 +254,6 @@ const Home = () => {
 
 
 
-
-
-
-
-    <section className="py-5 bg-light d-flex align-items-center" style={{ minHeight: '300px' }}>
-      <div className="container d-flex justify-content-between align-items-center">
-        <div>
-          <h1 className="display-4">Experience of Real Recipes Taste</h1>
-          <div className="d-flex mt-4">
-            <div className="me-5">
-              <h2>98K</h2>
-              <p>Daily Orders</p>
-            </div>
-            <div>
-              <h2>5+</h2>
-              <p>Menu & Dish</p>
-            </div>
-          </div>
-        </div>
-        <div>
-          <img src="https://images.pexels.com/photos/2159065/pexels-photo-2159065.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="Salmon Dish" className="img-fluid" />
-        </div>
-      </div>
-    </section>
 
 
 

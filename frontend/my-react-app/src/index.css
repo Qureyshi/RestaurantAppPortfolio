@@ -7,6 +7,14 @@ a{
   text-decoration: none;
 }
 
+.font-60{
+  font-size: 60px;
+}
+
+/* home*/
+
+
+
 
 /* booking*/
 
@@ -90,6 +98,12 @@ background-repeat: no-repeat;
 
 }
 
+.banner-img-4{
+  position: absolute;
+  top: -40px;
+  right: 0;
+}
+
 
 /* user login  */
 
@@ -171,7 +185,10 @@ font-size: 18px;
 
 
 .orders{
-  background-image: url(https://gramentheme.com/html/fresheat/assets/img/bg/breadcumb.jpg);;
+  background-image: url(images/breadcrumb.jpg);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 
