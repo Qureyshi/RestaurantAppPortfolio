@@ -252,7 +252,41 @@ class DeliveryCrewViewSet(viewsets.ViewSet):
 class ReservationListCreateView(generics.ListCreateAPIView):
     queryset = Reservation.objects.all()
     serializer_class = ReservationSerializer
+    permission_classes = [IsAuthenticated]
+
+    #def get_permissions(self):
+    #    # Only allow listing all reservations for admin and manager users
+    #    if self.request.method == 'GET':
+    #        self.permission_classes = [IsAuthenticated, IsManagerMemberOrAdmin]
+    #    return super().get_permissions()
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_staff or user.groups.filter(name="Manager").exists():
+            # Admins and Managers can see all reservations
+            return Reservation.objects.all()
+        else:
+            # Regular users can only see their own reservations
+            return Reservation.objects.filter(user=user)
+
+    def perform_create(self, serializer):
+        # Automatically associate the reservation with the logged-in user
+        serializer.save(user=self.request.user)
+
+
+class ReservationRetrieveUpdateView(generics.RetrieveUpdateAPIView):
+    queryset = Reservation.objects.all()
+    serializer_class = ReservationSerializer
     permission_classes = [IsAuthenticated, IsManagerMemberOrAdmin]
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_staff or user.groups.filter(name="Manager").exists():
+            # Admins and Managers can access any reservation for updating
+            return Reservation.objects.all()
+        else:
+            # Regular users shouldn't reach this view for updating
+            return Reservation.objects.none()
 
 
 class ReviewListCreateView(generics.ListCreateAPIView):

@@ -5,8 +5,8 @@ import { FaEye } from 'react-icons/fa';
 import { Modal, Button, Dropdown } from 'react-bootstrap';
 
 const getTokenFromCookies = () => {
-    const token = document.cookie.split('; ').find(row => row.startsWith('authToken='));
-    return token ? token.split('=')[1].trim() : null;
+  const token = document.cookie.split('; ').find(row => row.startsWith('authToken='));
+  return token ? token.split('=')[1].trim() : null;
 };
 
 const Orders = () => {
@@ -15,8 +15,9 @@ const Orders = () => {
   const [error, setError] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [statusUpdateLoading, setStatusUpdateLoading] = useState(false);
-  const [editingOrderId, setEditingOrderId] = useState(null); 
+  const [editingOrderId, setEditingOrderId] = useState(null);
   const [userRole, setUserRole] = useState(null);
+  const [username, setUsername] = useState(null); // State for username
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -50,15 +51,15 @@ const Orders = () => {
         }
 
         const data = await response.json();
-        let role;
+        setUsername(data.username); // Assign username from the fetched data
 
-        if (data.groups.includes('Manager')) {
-          role = 'Manager';
-        } else if (data.groups.includes('Delivery Crew')) {
-          role = 'Delivery Crew';
-        } else {
-          role = data.is_staff ? 'Admin' : 'User';
-        }
+        const role = data.groups.includes(1)
+          ? 'Manager'
+          : data.groups.includes(2)
+          ? 'Delivery Crew'
+          : data.is_staff
+          ? 'Admin'
+          : 'User';
 
         setUserRole(role);
       } catch (err) {
@@ -74,18 +75,14 @@ const Orders = () => {
   const allowedRoles = ['Admin', 'Manager', 'Delivery Crew'];
 
   const getStatusBadge = (status) => {
-    switch (status) {
-      case 'READY':
-        return <span className="badge bg-success">READY</span>;
-      case 'DELIVERED':
-        return <span className="badge bg-success">DELIVERED</span>;
-      case 'CANCELLED':
-        return <span className="badge bg-danger">CANCELLED</span>;
-      case 'PENDING':
-        return <span className="badge bg-warning text-dark">PENDING</span>;
-      default:
-        return <span className="badge bg-secondary">UNKNOWN</span>;
-    }
+    const statusClasses = {
+      READY: 'bg-success',
+      DELIVERED: 'bg-success',
+      CANCELLED: 'bg-danger',
+      PENDING: 'bg-warning text-dark',
+    };
+    
+    return <span className={`badge ${statusClasses[status] || 'bg-secondary'}`}>{status}</span>;
   };
 
   const handleShowDetails = (order) => {
@@ -105,7 +102,7 @@ const Orders = () => {
       const response = await fetch(`http://localhost:8000/api/orders/${orderId}`, {
         method: 'PUT',
         headers: {
-          'Authorization': `Token ${authToken}`,
+          Authorization: `Token ${authToken}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ status: newStatus }),
@@ -113,7 +110,7 @@ const Orders = () => {
 
       if (!response.ok) throw new Error('Failed to update status.');
 
-      setOrders(orders.map(order => 
+      setOrders(prevOrders => prevOrders.map(order => 
         order.id === orderId ? { ...order, status: newStatus } : order
       ));
       setEditingOrderId(null); // Reset after updating
@@ -140,17 +137,19 @@ const Orders = () => {
                 <th>Order ID</th>
                 <th>Date</th>
                 <th>Customer Name</th>
+                <th>Delivery Crew</th> {/* New Delivery Crew field */}
                 <th>Amount</th>
                 <th>Status</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {orders.map((order) => (
+              {orders.map(order => (
                 <tr key={order.id}>
                   <td>#{order.id}</td>
                   <td>{new Date(order.date).toLocaleString()}</td>
-                  <td>{order.customer_name}</td>
+                  <td>{username}</td> {/* Display username here */}
+                  <td>{order.delivery_crew}</td> {/* Display Delivery Crew name */}
                   <td>${order.total}</td>
                   <td>
                     {editingOrderId === order.id && allowedRoles.includes(userRole) ? (
@@ -158,12 +157,10 @@ const Orders = () => {
                         <Dropdown.Toggle variant="primary" size="sm" id="dropdown-status">
                           {order.status}
                         </Dropdown.Toggle>
-
                         <Dropdown.Menu>
-                          <Dropdown.Item eventKey="PENDING">PENDING</Dropdown.Item>
-                          <Dropdown.Item eventKey="READY">READY</Dropdown.Item>
-                          <Dropdown.Item eventKey="DELIVERED">DELIVERED</Dropdown.Item>
-                          <Dropdown.Item eventKey="CANCELLED">CANCELLED</Dropdown.Item>
+                          {['PENDING', 'READY', 'DELIVERED', 'CANCELLED'].map(status => (
+                            <Dropdown.Item key={status} eventKey={status}>{status}</Dropdown.Item>
+                          ))}
                         </Dropdown.Menu>
                       </Dropdown>
                     ) : (
@@ -204,7 +201,7 @@ const Orders = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {selectedOrder.orderitem.map((item) => (
+                  {selectedOrder.orderitem.map(item => (
                     <tr key={item.menuitem.id}>
                       <td>{item.menuitem.title}</td>
                       <td>{item.quantity}</td>

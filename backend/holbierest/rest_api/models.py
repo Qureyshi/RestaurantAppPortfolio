@@ -83,6 +83,7 @@ class OrderItem(models.Model):
     from django.db import models
 
 class Reservation(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name='reservations')
     date = models.DateField()
     time = models.TimeField()
     phone_number = models.CharField(max_length=15)
