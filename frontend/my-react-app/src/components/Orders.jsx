@@ -19,12 +19,16 @@ const Orders = () => {
   const [editingOrderId, setEditingOrderId] = useState(null);
   const [userRole, setUserRole] = useState(null);
   const [username, setUsername] = useState(null);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
+  const itemsPerPage = 8;
 
   useEffect(() => {
-    const fetchOrders = async () => {
+    const fetchOrders = async (page) => {
       try {
         const authToken = getTokenFromCookies();
-        const response = await fetch('http://localhost:8000/api/orders', {
+        const response = await fetch(`http://localhost:8000/api/orders?page=${page}&ordering=-date`, {
           headers: { Authorization: `Token ${authToken}` },
         });
 
@@ -32,6 +36,7 @@ const Orders = () => {
 
         const data = await response.json();
         setOrders(data.results ?? []);
+        setTotalPages(Math.ceil(data.count / itemsPerPage));
       } catch (err) {
         setError(err.message);
       }
@@ -69,9 +74,9 @@ const Orders = () => {
       }
     };
 
-    fetchOrders();
+    fetchOrders(page);
     fetchUserRole();
-  }, []);
+  }, [page]);
 
   const allowedRoles = ['Admin', 'Manager', 'Delivery Crew'];
 
@@ -120,6 +125,10 @@ const Orders = () => {
     } finally {
       setStatusUpdateLoading(false);
     }
+  };
+
+  const handlePageChange = (newPage) => {
+    if (newPage > 0 && newPage <= totalPages) setPage(newPage);
   };
 
   return (
@@ -185,6 +194,25 @@ const Orders = () => {
               </tbody>
             </table>
           )}
+
+          {/* Pagination Controls */}
+          <div className="pagination-controls">
+            <button
+              className="btn btn-secondary me-2"
+              disabled={page <= 1}
+              onClick={() => handlePageChange(page - 1)}
+            >
+              Previous
+            </button>
+            <span>Page {page} of {totalPages}</span>
+            <button
+              className="btn btn-secondary ms-2"
+              disabled={page >= totalPages}
+              onClick={() => handlePageChange(page + 1)}
+            >
+              Next
+            </button>
+          </div>
 
           {selectedOrder && (
             <Modal show={showModal} onHide={handleCloseModal}>
