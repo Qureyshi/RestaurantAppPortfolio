@@ -1,23 +1,22 @@
 import React from "react";
-import { Link, useNavigate } from 'react-router-dom';
-import { FaTrash } from 'react-icons/fa';
-import { FaCartArrowDown } from "react-icons/fa";
+import './Navbar.css'
+import { Link, useNavigate } from "react-router-dom";
+import { FaTrash, FaShoppingBasket } from "react-icons/fa";
 
 const MyNavbar = () => {
   const navigate = useNavigate();
+  
+  const isLoggedIn = document.cookie.includes("authToken");
 
-  // Function to clear the authToken cookie
   const handleLogout = () => {
-    // Clear the authToken cookie by setting its expiry date to a past time
     document.cookie = "authToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    navigate("/loginform"); // Redirect to the login page after logout
+    navigate("/loginform");
   };
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
-      <div className="container d-flex justify-content-between">
-        {/* Left side - RMS logo */}
-        <Link className='navbar-brand text-light' to="/"><h1>RMS</h1></Link>
+    <nav className="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+      <div className="container">
+        <Link className="navbar-brand text-light fs-3 fw-bold" to="/">RMS</Link>
         <button
           className="navbar-toggler"
           type="button"
@@ -31,32 +30,39 @@ const MyNavbar = () => {
         </button>
 
         <div className="collapse navbar-collapse" id="navbarNav">
-          {/* Right side - other links */}
-          <ul className="navbar-nav ms-auto d-flex align-items-center">
-            <li className="nav-item p-2">
-              <Link className='text-light' to="/menu">Menu</Link>
+          <ul className="navbar-nav ms-auto d-flex align-items-center gap-3">
+            <li className="nav-item">
+              <Link className="nav-link text-light" to="/menu">Menu</Link>
             </li>
-            <li className="nav-item p-2">
-              <Link className='text-light' to="/reservation">Reservation</Link>
+            <li className="nav-item">
+              <Link className="nav-link text-light" to="/reservation">Reservation</Link>
             </li>
-            <li className="nav-item p-2">
-              <Link className='text-light' to="/loginform">Login</Link>
+            {!isLoggedIn && (
+              <>
+                <li className="nav-item">
+                  <Link className="nav-link text-light" to="/loginform">Login</Link>
+                </li>
+                <li className="nav-item">
+                  <Link className="nav-link text-light" to="/register">Register</Link>
+                </li>
+              </>
+            )}
+            <li className="nav-item">
+              <Link className="nav-link text-light" to="/orders">Orders</Link>
             </li>
-            <li className="nav-item p-2">
-              <Link className='text-light' to="/register">Register</Link>
+            <li className="nav-item">
+              <Link className="nav-link text-light" to="/cart">
+                <FaShoppingBasket />
+              </Link>
             </li>
-            <li className="nav-item p-2">
-              <Link className='text-light' to="/orders">Orders</Link>
-            </li>
-            <li className="nav-item p-2">
-              <Link className='text-light' to="/cart"><FaCartArrowDown /></Link>
-            </li>
+            {isLoggedIn && (
+              <li className="nav-item">
+                <button className="btn btn-outline-light" onClick={handleLogout}>
+                  Logout
+                </button>
+              </li>
+            )}
           </ul>
-
-          {/* Logout Button */}
-          <button className="btn btn-outline-light ms-3" onClick={handleLogout}>
-            Logout
-          </button>
         </div>
       </div>
     </nav>

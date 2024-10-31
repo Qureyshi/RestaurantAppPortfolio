@@ -1,0 +1,56 @@
+/* login.css */
+
+/* Container styling for the login form */
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #5a67d8, #667eea);
+  }
+  
+  .shadow {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+  
+  h3 {
+    font-weight: bold;
+    color: #4a5568;
+  }
+  
+  .form-label {
+    color: #4a5568;
+  }
+  
+  .btn-primary {
+    background-color: #4a67d8;
+    border-color: #4a67d8;
+    transition: background-color 0.3s ease;
+  }
+  
+  .btn-primary:hover {
+    background-color: #3b55d4;
+  }
+  
+  .alert {
+    border-radius: 5px;
+  }
+  
+  .mt-3 a {
+    color: #667eea;
+  }
+  
+  .mt-3 a:hover {
+    color: #4a67d8;
+    text-decoration: underline;
+  }
+  
+  @media (max-width: 768px) {
+    .container {
+      padding: 1rem;
+    }
+    .col-lg-6 {
+      padding: 2rem;
+    }
+  }
+  

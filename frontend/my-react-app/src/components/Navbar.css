@@ -1,0 +1,38 @@
+/* Navbar custom styling */
+.navbar {
+    padding: 1rem 1.5rem;
+  }
+  
+  .navbar-brand {
+    font-size: 1.8rem;
+    color: #ffffff;
+  }
+  
+  .navbar-toggler {
+    border-color: #ffffff;
+  }
+  
+  .navbar-toggler-icon {
+    color: #ffffff;
+  }
+  
+  .nav-link {
+    font-size: 1.1rem;
+    color: #f8f9fa;
+  }
+  
+  .nav-link:hover {
+    color: #ced4da;
+    text-decoration: underline;
+  }
+  
+  .btn-outline-light {
+    padding: 0.4rem 0.8rem;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+  }
+  
+  .btn-outline-light:hover {
+    background-color: #ffffff;
+    color: #343a40;
+  }
