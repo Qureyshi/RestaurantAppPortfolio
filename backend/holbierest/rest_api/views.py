@@ -185,17 +185,32 @@ class SingleOrderView(generics.RetrieveUpdateAPIView):
     permission_classes = [IsAuthenticated]
 
     def update(self, request, *args, **kwargs):
-        # Check if the user belongs to a group
-        if self.request.user.groups.count() == 0 and not self.request.user.is_superuser:  # Normal user, not belonging to any group = Customer
-            return Response({'error': 'Not authorized to update order status.'}, status=status.HTTP_403_FORBIDDEN)
+        # Check if the user belongs to a group or is a superuser
+        if self.request.user.groups.count() == 0 and not self.request.user.is_superuser:
+            return Response({'error': 'Not authorized to update order.'}, status=status.HTTP_403_FORBIDDEN)
 
-        # Extract the new status from the request data
-        new_status = request.data.get('status')        
-
+        # Retrieve the order instance
         order = self.get_object()
-        order.status = new_status
+
+        # Update the order status if provided
+        new_status = request.data.get('status')
+        if new_status is not None:
+            order.status = new_status
+
+        # Assign delivery crew if provided
+        delivery_crew_id = request.data.get('delivery_crew')
+        
+        if delivery_crew_id is not None:
+            try:
+                delivery_crew = User.objects.get(id=int(delivery_crew_id), groups__name='Delivery Crew')               
+                order.delivery_crew = delivery_crew
+            except User.DoesNotExist:                
+                return Response({'error': 'Invalid delivery crew ID.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Save the updated order
         order.save()
 
+        # Serialize and return the updated order
         serializer = self.get_serializer(order)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
