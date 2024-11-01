@@ -53,7 +53,7 @@ const Reservation = () => {
 
       const result = await response.json();
       console.log(result);
-   
+      window.location.href = '/'; // Redirect to home page on success
 
     } catch (error) {
       console.error('Error:', error);
