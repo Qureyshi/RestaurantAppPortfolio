@@ -37,16 +37,22 @@ const Orders = () => {
   const [statusUpdateLoading, setStatusUpdateLoading] = useState(false); // Loading state for updating order status
   const [deliveryCrewLoading, setDeliveryCrewLoading] = useState(false); // Loading state for fetching delivery crew
 
-  // Pagination
-  const [page, setPage] = useState(1); // Current page
-  const [totalPages, setTotalPages] = useState(1); // Total number of pages available
+  // Orders Pagination
+  const [page, setPage] = useState(1); // Current page for orders
+  const [totalPages, setTotalPages] = useState(1); // Total number of pages available for orders
+
+  // Reservations Pagination
+  const [reservations, setReservations] = useState([]); // Store list of reservations
+  const [loading, setLoading] = useState(true); // Loading state for reservations
+  const [reservationPage, setReservationPage] = useState(1); // Current page for reservations
+  const [totalReservationPages, setTotalReservationPages] = useState(1); // Total number of pages available for reservations
 
   // User Role and Username
   const [userRole, setUserRole] = useState(null); // Role of the user (Admin, Manager, etc.)
   const [username, setUsername] = useState(null); // Logged-in username
   const [customer_username, setCustomerUsername] = useState(null); // Customer username
 
-  const itemsPerPage = 8;
+  const itemsPerPage = 8; // Items per page for orders and reservations
 
   useEffect(() => {
     const fetchOrders = async (page) => {
@@ -66,37 +72,9 @@ const Orders = () => {
       }
     };
 
-    const CustomerUsername = async (user_id) => {
-      try {
-        const authToken = getTokenFromCookies();
-        if (!authToken) throw new Error('Authentication token not found.');
-
-        const response = await fetch('http://127.0.0.1:8000/auth/users', {
-          headers: { Authorization: `Token ${authToken}` },
-        });
-
-        if (!response.ok) {
-          if (response.status === 401) throw new Error('Unauthorized access.');
-          throw new Error('Failed to fetch user role.');
-        }
-
-        const data = await response.json();
-
-        if (data.id === orders.user) {
-          setCustomerUsername(data.username);
-        }        
-
-      } catch (err) {
-        console.error('Error fetching username:', err);
-        setError(err.message);
-      }
-    };
-
     const fetchUserRole = async () => {
       try {
         const authToken = getTokenFromCookies();
-        if (!authToken) throw new Error('Authentication token not found.');
-
         const response = await fetch('http://127.0.0.1:8000/auth/users/me', {
           headers: { Authorization: `Token ${authToken}` },
         });
@@ -141,23 +119,42 @@ const Orders = () => {
       }
     };
 
-    fetchOrders(page);
-    fetchUserRole();
-    fetchDeliveryCrewOptions();    
-  }, [page, userRole]);
+    const fetchReservations = async (page) => {
+      const authToken = getTokenFromCookies();
+      if (!authToken) {
+        console.error('Authorization token is missing.');
+        return;
+      }
 
-  const allowedRoles = ['Admin', 'Manager', 'Delivery Crew'];
+      try {
+        const response = await fetch(`http://localhost:8000/api/reservations?page=${page}`, {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Token ${authToken}`,
+          },
+        });
 
-  const getStatusBadge = (status) => {
-    const statusClasses = {
-      READY: 'bg-success',
-      DELIVERED: 'bg-success',
-      CANCELLED: 'bg-danger',
-      PENDING: 'bg-warning text-dark',
+        if (!response.ok) {
+          throw new Error(`Network response was not ok: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        setReservations(data.results || []);
+        setTotalReservationPages(Math.ceil(data.count / itemsPerPage)); // Calculate total pages for reservations
+      } catch (error) {
+        console.error('Error fetching reservations:', error);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    return <span className={`badge ${statusClasses[status] || 'bg-secondary'}`}>{status}</span>;
-  };
+    fetchOrders(page);
+    fetchUserRole();
+    fetchDeliveryCrewOptions(); 
+    fetchReservations(reservationPage); // Fetch reservations for the current page    
+  }, [page, reservationPage, userRole]);
+
+  const allowedRoles = ['Admin', 'Manager', 'Delivery Crew'];
 
   const handleShowDetails = (order) => {
     setSelectedOrder(order);
@@ -169,7 +166,7 @@ const Orders = () => {
     setSelectedOrder(null);
   };
 
-  const handleAssignDeliveryCrew = async (orderId, deliveryCrewId) => {    
+  const handleAssignDeliveryCrew = async (orderId, deliveryCrewId) => {
     const authToken = getTokenFromCookies();
     try {
       const response = await fetch(`http://localhost:8000/api/orders/${orderId}`, {
@@ -224,98 +221,113 @@ const Orders = () => {
     if (newPage > 0 && newPage <= totalPages) setPage(newPage);
   };
 
+  const handleReservationPageChange = (newPage) => {
+    if (newPage > 0 && newPage <= totalReservationPages) setReservationPage(newPage);
+  };
+
   // Log the props at the start of the component
   console.log('User Role:', userRole);
   console.log('Order:', orders);
   console.log('Delivery Crew Options:', deliveryCrewOptions);
 
-
   return (
     <>
       <div className="content-wrapper">
         <MyNavbar />
-        <main className="container mt-5">
-          <h2 className="mb-4">Order List</h2>
-
-          {error && <div className="alert alert-danger">{error}</div>}
-          {orders.length === 0 ? (
-            <p>No orders found.</p>
+        <div className="container mt-5">
+          <h2 className='fw-bold'>Your Reservations</h2>
+          {loading ? (
+            <div>Loading your reservations...</div>
           ) : (
-            <table className="table table-striped">
-              <thead>
-                <tr>
-                  <th>Order ID</th>
-                  <th>Date</th>
-                  <th>Customer Name</th>
-                  <th>Delivery Crew</th>
-                  <th>Amount</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {orders.map(order => (
-                  <tr key={order.id}>
-                    <td>#{order.id}</td>
-                    <td>{new Date(order.date).toLocaleString()}</td>
-                    <td>{order.user}</td>
-                    <td>
-                      {userRole === 'Admin' || userRole === 'Manager' ? (
-                        <Dropdown onSelect={(crewId) => handleAssignDeliveryCrew(order.id, crewId)}>
-                          <Dropdown.Toggle variant="primary" size="sm" id="dropdown-crew">
-                            {order.delivery_crew
-                              ? deliveryCrewOptions.find(crew => crew.id === order.delivery_crew)?.username
-                              : 'Assign Crew'}
-                          </Dropdown.Toggle>
-                          <Dropdown.Menu>
-                            {deliveryCrewOptions.map(crew => (
-                              <Dropdown.Item key={crew.id} eventKey={crew.id}>
-                                {crew.username}
-                              </Dropdown.Item>
-                            ))}
-                          </Dropdown.Menu>
-                        </Dropdown>
-                      ) : (
-                        order.delivery_crew
-                          ? deliveryCrewOptions.find(crew => crew.id === order.delivery_crew)?.username
-                          : 'Unassigned'
-                      )}
-                   </td>
-                    <td>${order.total}</td>
-                    <td>
-                      {editingOrderId === order.id && allowedRoles.includes(userRole) ? (
-                        <Dropdown onSelect={(newStatus) => handleStatusChange(order.id, newStatus)}>
-                          <Dropdown.Toggle variant="primary" size="sm" id="dropdown-status">
-                            {order.status}
-                          </Dropdown.Toggle>
-                          <Dropdown.Menu>
-                            {['PENDING', 'READY', 'DELIVERED', 'CANCELLED'].map(status => (
-                              <Dropdown.Item key={status} eventKey={status}>{status}</Dropdown.Item>
-                            ))}
-                          </Dropdown.Menu>
-                        </Dropdown>
-                      ) : (
-                        getStatusBadge(order.status)
-                      )}
-                    </td>
-                    <td>
-                      <FaEye style={{ cursor: 'pointer', marginRight: '10px' }} onClick={() => handleShowDetails(order)} />
-                      {allowedRoles.includes(userRole) && (
-                        <button
-                          className="btn btn-sm btn-link"
-                          onClick={() => setEditingOrderId(order.id)}
-                        >
-                          Edit Status
-                        </button>
-                      )}
-                    </td>
+            reservations.length > 0 ? (
+              <table className="table table-striped">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Guests</th>
+                    <th>Phone</th>
+                    <th>Comments</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {reservations.map((reservation, index) => (
+                    <tr key={index} className="reservation-item">
+                      <td>{reservation.date}</td>
+                      <td>{reservation.time}</td>
+                      <td>{reservation.number_of_guests}</td>
+                      <td>{reservation.phone_number}</td>
+                      <td>{reservation.message}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <p>You have no reservations.</p>
+            )
           )}
+          <div className="pagination-controls">
+            <button
+              className="btn btn-secondary me-2"
+              disabled={reservationPage <= 1}
+              onClick={() => handleReservationPageChange(reservationPage - 1)}
+            >
+              Previous
+            </button>
+            <span>Page {reservationPage} of {totalReservationPages}</span>
+            <button
+              className="btn btn-secondary ms-2"
+              disabled={reservationPage >= totalReservationPages}
+              onClick={() => handleReservationPageChange(reservationPage + 1)}
+            >
+              Next
+            </button>
+          </div>
 
-          {/* Pagination Controls */}
+          <h2 className='fw-bold mt-5'>Your Orders</h2>
+          {error && <div className="alert alert-danger">{error}</div>}
+          <table className="table table-striped">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Status</th>
+                {allowedRoles.includes(userRole) && <th>Delivery Crew</th>}
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {orders.map(order => (
+                <tr key={order.id}>
+                  <td>{order.date}</td>
+                  <td>{order.time}</td>
+                  <td>{getStatusBadge(order.status)}</td>
+                  {allowedRoles.includes(userRole) && (
+                    <td>
+                      <Dropdown>
+                        <Dropdown.Toggle variant="success" id="dropdown-basic">
+                          {order.delivery_crew ? deliveryCrewOptions.find(crew => crew.id === order.delivery_crew)?.username : 'Select Crew'}
+                        </Dropdown.Toggle>
+                        <Dropdown.Menu>
+                          {deliveryCrewOptions.map(crew => (
+                            <Dropdown.Item key={crew.id} onClick={() => handleAssignDeliveryCrew(order.id, crew.id)}>
+                              {crew.username}
+                            </Dropdown.Item>
+                          ))}
+                        </Dropdown.Menu>
+                      </Dropdown>
+                    </td>
+                  )}
+                  <td>
+                    <button className="btn btn-info" onClick={() => handleShowDetails(order)}>
+                      <FaEye /> View
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
           <div className="pagination-controls">
             <button
               className="btn btn-secondary me-2"
@@ -334,44 +346,41 @@ const Orders = () => {
             </button>
           </div>
 
-          {selectedOrder && (
-            <Modal show={showModal} onHide={handleCloseModal}>
-              <Modal.Header closeButton>
-                <Modal.Title>Order #{selectedOrder.id} Details</Modal.Title>
-              </Modal.Header>
-              <Modal.Body>
-                <h5>Order Items</h5>
-                <table className="table">
-                  <thead>
-                    <tr>
-                      <th>Title</th>
-                      <th>Quantity</th>
-                      <th>Price</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {selectedOrder.orderitem.map(item => (
-                      <tr key={item.menuitem.id}>
-                        <td>{item.menuitem.title}</td>
-                        <td>{item.quantity}</td>
-                        <td>${item.price}</td>
-                      </tr>
+          <Modal show={showModal} onHide={handleCloseModal}>
+            <Modal.Header closeButton>
+              <Modal.Title>Order Details</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              {selectedOrder && (
+                <div>
+                  <h5>Order ID: {selectedOrder.id}</h5>
+                  <p><strong>Items:</strong></p>
+                  <ul>
+                    {selectedOrder.items.map(item => (
+                      <li key={item.id}>{item.name} - Quantity: {item.quantity}</li>
                     ))}
-                  </tbody>
-                </table>
-                <p><strong>Total:</strong> ${selectedOrder.total}</p>
-                <h5>Status</h5>
-                <p>{selectedOrder.status}</p>
-                {statusUpdateLoading && <p>Updating status...</p>}
-              </Modal.Body>
-              <Modal.Footer>
-                <Button variant="secondary" onClick={handleCloseModal}>
-                  Close
-                </Button>
-              </Modal.Footer>
-            </Modal>
-          )}
-        </main>
+                  </ul>
+                  <p><strong>Total Price:</strong> ${selectedOrder.total_price}</p>
+                </div>
+              )}
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={handleCloseModal}>
+                Close
+              </Button>
+              {allowedRoles.includes(userRole) && (
+                <>
+                  <Button variant="danger" onClick={() => handleStatusChange(selectedOrder.id, 'CANCELLED')}>
+                    Cancel Order
+                  </Button>
+                  <Button variant="success" onClick={() => handleStatusChange(selectedOrder.id, 'DELIVERED')}>
+                    Mark as Delivered
+                  </Button>
+                </>
+              )}
+            </Modal.Footer>
+          </Modal>
+        </div>
         <MyFooter />
       </div>
     </>

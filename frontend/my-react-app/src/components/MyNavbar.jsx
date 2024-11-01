@@ -1,10 +1,11 @@
-import React from "react";
-import './Navbar.css'
+import React, { useEffect, useState } from "react";
+import './Navbar.css';
 import { Link, useNavigate } from "react-router-dom";
 import { FaTrash, FaShoppingBasket } from "react-icons/fa";
 
 const MyNavbar = () => {
   const navigate = useNavigate();
+  const [username, setUsername] = useState(null);
   
   const isLoggedIn = document.cookie.includes("authToken");
 
@@ -12,6 +13,41 @@ const MyNavbar = () => {
     document.cookie = "authToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     navigate("/loginform");
   };
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const authToken = document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('authToken='))
+        ?.split('=')[1];
+
+      if (authToken) {
+        try {
+          const response = await fetch('http://localhost:8000/auth/users/me', {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Token ${authToken}`,
+            },
+          });
+
+          if (!response.ok) {
+            throw new Error('Failed to fetch user data');
+          }
+
+          const data = await response.json();
+          setUsername(data.username); // Set the username from the response
+
+        } catch (error) {
+          console.error('Error fetching user data:', error);
+        }
+      }
+    };
+
+    if (isLoggedIn) {
+      fetchUserData();
+    }
+  }, [isLoggedIn]); // Only fetch user data if logged in
 
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
@@ -56,11 +92,14 @@ const MyNavbar = () => {
               </Link>
             </li>
             {isLoggedIn && (
-              <li className="nav-item">
-                <button className="btn btn-outline-light" onClick={handleLogout}>
-                  Logout
-                </button>
-              </li>
+              <>
+                <Link className="nav-link text-light" to="/orders">{username}</Link>
+                <li className="nav-item">
+                  <button className="btn btn-outline-light" onClick={handleLogout}>
+                    Logout
+                  </button>
+                </li>
+              </>
             )}
           </ul>
         </div>

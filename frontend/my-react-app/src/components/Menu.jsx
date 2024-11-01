@@ -126,48 +126,56 @@ const Menu = () => {
           <h1 className="font-weight-bold">MENU</h1>
         </div>
       </div>
-      <div className="container py-5">
-        <h1 className="text-center font-weight-bold">Best Selling Dishes</h1>
-        <div className="d-flex justify-content-center my-3">
-          {categoryData.map((item) => (
-            <button
-              key={item.id}
-              className={`btn rounded-pill mx-2 ${
-                activeCategory === item.title ? 'btn-danger' : 'btn-outline-danger'
-              }`}
-              onClick={() => handleCategoryClick(item.title)}
-            >
-              {item.title}
-            </button>
-          ))}
-        </div>
-        <div className="row">
-          {menuData.map((item) => (
-            <div className="col-3" key={item.id}>
-              <div className="rounded bg-light py-3 mt-5 d-flex flex-column align-items-center text-center">
-                <img
-                  src={item.image}
-                  alt={item.title}
-                  className="rounded-circle"
-                  style={{ width: '60%', height: 'auto' }}
-                />
-                <h4 className="mt-2">{item.title}</h4>
-                <h6 className="mt-2 text-danger font-weight-bold">
-                  ${parseFloat(item.price).toFixed(2)}
-                </h6>
-                <button 
-                  className="btn btn-danger mt-2" 
-                  onClick={() => handleAddToCart(item.id, 1)} // Pass the item to the handler
-                >
-                  Add to cart
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
 
-        {/* Pagination Controls */}
-        <div className="d-flex justify-content-center mt-4">
+
+      <div className="container py-5">
+        <div className="row g-4">
+          <div className="col-3">
+            <ul>
+            {categoryData.map((item) => (
+              <li >
+              <a
+                href='#'
+                className={`${
+                  activeCategory === item.title ? 'link-dark' : 'link-danger'
+                }`}
+                onClick={() => handleCategoryClick(item.title)}
+              >
+                {item.title}
+              </a>
+              </li>
+            ))}
+            </ul>
+          </div>
+          <div className="col-9">
+            <div className="row g-4">
+              {menuData.map((item) => (
+              <div className="col-4" key={item.id}>
+                <div className="rounded p-2 overflow-hidden bg-light">
+                  <img 
+                    src={item.image}
+                    alt={item.title}
+                    className="object-fit-cover"
+                    style={{ width: '100%', height: '250px' }}
+                  />
+                  <h3 className="fw-bold my-2">{item.title}</h3>
+                  <p className='text-secondary'>It is a long established fact that a reader will be distracted.</p>
+                  <h3 className="text-danger fw-bold">
+                    ${parseFloat(item.price).toFixed(2)}
+                  </h3>
+                  <button 
+                    className="btn btn-danger mt-2" 
+                    onClick={() => handleAddToCart(item.id, 1)} // Pass the item to the handler
+                  >
+                    Add to cart
+                  </button>
+                </div>
+              </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="d-flex justify-content-center mt-4">
           {previousPage && (
             <button
               className="btn btn-outline-danger mx-2"
@@ -184,11 +192,50 @@ const Menu = () => {
               Next
             </button>
           )}
+          </div>
+
+
+
+
+
+
+
         </div>
       </div>
-      <div className="specialfood bg-danger">
-        <div className="container p-5">.</div>
-      </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
       <MyFooter />
     </>
   );

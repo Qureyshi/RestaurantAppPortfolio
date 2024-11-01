@@ -107,6 +107,29 @@ background-repeat: no-repeat;
 
 /* user login  */
 
+.login::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 500px; /* Adjust width */
+  height: 500px;
+  border-radius: 10%; /* Adjust height */
+  transform: translate(-50%, -50%) rotate(50deg);
+  background-color: #ffc107;
+  background-size: contain;
+  background-repeat: no-repeat;
+  opacity: 1; /* Adjust opacity */
+  z-index: 0;
+ 
+}
+
+
+
+
+
+
+
 
 .bg-image-login {
 background-image: url('https://images.pexels.com/photos/845798/pexels-photo-845798.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'); /* Replace with your image URL */

@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { FaFacebookF, FaTwitter, FaInstagram, FaYoutube } from 'react-icons/fa';
 import MyFooter from './MyFooter';
 import MyNavbar from './MyNavbar';
-import './Reservation.css'; // Optional: Import custom CSS for additional styling
 
 const Reservation = () => {
   const [formData, setFormData] = useState({
@@ -61,107 +60,81 @@ const Reservation = () => {
     }
   };
 
-  const fetchReservations = async () => {
-    const authToken = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('authToken='))
-      ?.split('=')[1];
-
-    if (!authToken) {
-      console.error('Authorization token is missing.');
-      return;
-    }
-
-    try {
-      const response = await fetch('http://localhost:8000/api/reservations', {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Token ${authToken}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`Network response was not ok: ${response.statusText}`);
-      }
-
-      const data = await response.json();      
-      setReservations(data.results || []);
-    } catch (error) {
-      console.error('Error fetching reservations:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchReservations();
-  }, []);
-
   return (
     <>
       <MyNavbar />
-      <div className='container-fluid p-5 reservation-header text-center text-white bg-danger'>
-        <h1>Make a Reservation</h1>
+      <div className='container-fluid p-5 orders'>
+        <div className='p-5 text-center text-danger'>
+          <h1>Reservation</h1>
+        </div>
       </div>
       <div className='container py-5'>
         <div className="row gy-5">
-          <div className="col-lg-6 bg-light p-5 rounded">
-            <h2 className='my-5'>Create a <span className="text-danger">Reservation</span></h2>
-            <form className="reservation-form" onSubmit={handleSubmit}>
-              <div className="form-row">
-                <div className="form-group col-md-6">
-                  <label htmlFor="date">Select Date*</label>
-                  <input className='form-control' id="date" name="date" type="date" value={formData.date} onChange={handleChange} required />
+          <div className="col-xl-6 d-flex align-items-center">
+            <div className="get-in-touch">
+              <h1 className='fw-bold'>GET IN TOUCH</h1>
+              <p className="my-4">Consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
+                  dolore of magna aliqua. Ut enim ad minim veniam, made</p>
+              <div className="d-flex align-items-center">
+                <div className="p-3">
+                  <h3 className='fw-bold'>Contact</h3>
+                  <p>+012 3455 862 69</p>
                 </div>
-                <div className="form-group col-md-6">
-                  <label htmlFor="time">Select Time*</label>
-                  <input className='form-control' id="time" name="time" type="time" value={formData.time} onChange={handleChange} required />
-                </div>
-                <div className="form-group col-md-6">
-                  <label htmlFor="phone">Phone Number*</label>
-                  <input className='form-control' id="phone" name="phone" type="tel" placeholder="Phone Number" value={formData.phone} onChange={handleChange} required />
-                </div>
-                <div className="form-group col-md-6">
-                  <label htmlFor="people">Number of Guests*</label>
-                  <input className='form-control' id="people" name="people" type="number" placeholder="Guests" value={formData.people} onChange={handleChange} required />
-                </div>
-                <div className="form-group col-12">
-                  <label htmlFor="comments">Comments</label>
-                  <textarea id="comments" name="comments" className="form-control" placeholder="Write your message here..." rows="5" value={formData.comments} onChange={handleChange}></textarea>
-                </div>
-                <div className="form-group col-12">
-                  <button className="btn btn-danger btn-md btn-block" type="submit">Book a Table</button>
+                <div className="p-3">
+                  <h3 className='fw-bold'>Email</h3>
+                  <p>companyInfo@gmail.com</p>
                 </div>
               </div>
-            </form>
+              <div className="d-flex align-items-center">
+                <div className="p-3">
+                  <h3 className='fw-bold'>Address</h3>
+                  <p>Jackpark, Ghana</p>
+                </div>
+                <div className="p-3">
+                  <h3 className='fw-bold'>Follow</h3>
+                  <ul className="list-inline">
+                    <li className="list-inline-item"><a href="#"><FaFacebookF /></a></li>
+                    <li className="list-inline-item"><a href="#"><FaTwitter /></a></li>
+                    <li className="list-inline-item"><a href="#"><FaInstagram /></a></li>
+                    <li className="list-inline-item"><a href="#"><FaYoutube /></a></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
           </div>
-
-          {/* Add margin-bottom for spacing between sections */}
-          <div className="col-lg-6 mt-5">
-            <h2 className='fw-bold'>Your Reservations</h2>
-            {loading ? (
-              <div>Loading your reservations...</div>
-            ) : (
-              reservations.length > 0 ? (
-                <ul className="reservation-list">
-                  {reservations.map((reservation, index) => (
-                    <li key={index} className="reservation-item">
-                      <p><strong>Date:</strong> {reservation.date}</p>
-                      <p><strong>Time:</strong> {reservation.time}</p>
-                      <p><strong>Guests:</strong> {reservation.number_of_guests}</p>
-                      <p><strong>Phone:</strong> {reservation.phone_number}</p>
-                      <p><strong>Comments:</strong> {reservation.message}</p>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p>You have no reservations.</p>
-              )
-            )}
+          <div className="col-xl-6 bg-light p-5 rounded">
+            <div className="reservation-form">
+              <div className="contact-form style2">
+                <h2 className='my-5'>Create An <span className="text-danger">Reservation</span> </h2>
+                <form className="row" onSubmit={handleSubmit}>
+                  <div className="col-md-6 mb-4">
+                    <label className="mb-2 d-block" htmlFor="date">Select Date*</label>
+                    <input className='form-control' id="date" name="date" type="date" value={formData.date} onChange={handleChange} required />
+                  </div>
+                  <div className="col-md-6 mb-4">
+                    <label className="mb-2 d-block" htmlFor="time">Select Time*</label>
+                    <input className='form-control' id="time" name="time" type="time" value={formData.time} onChange={handleChange} required />
+                  </div>
+                  <div className="col-md-6 mb-4">
+                    <label className="mb-2 d-block" htmlFor="phone">Give Phone Number*</label>
+                    <input className='form-control' id="phone" name="phone" type="number" placeholder="Phone Number" value={formData.phone} onChange={handleChange} required />
+                  </div>
+                  <div className="col-md-6 mb-4">
+                    <label className="mb-2 d-block" htmlFor="people">Number of Guests*</label>
+                    <input className='form-control' id="people" name="people" type="number" placeholder="Guests" value={formData.people} onChange={handleChange} required />
+                  </div>
+                  <div className="col-12 mb-4">
+                    <textarea id="comments" name="comments" className="form-control" placeholder="Write your message here..." rows="5" value={formData.comments} onChange={handleChange}></textarea>
+                  </div>
+                  <div className="col-12 form-group mb-5">
+                    <button className="btn btn-danger btn-md btn-block" type="submit">BOOK A TABLE</button>
+                  </div>
+                </form>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-
       <MyFooter />
     </>
   );
