@@ -131,13 +131,16 @@ const Menu = () => {
       <div className="container py-5">
         <div className="row g-4">
           <div className="col-3">
-            <ul>
+            <h5 className='fw-bold'>CATAGORIES</h5>
+            <ul className='list-group'>
             {categoryData.map((item) => (
-              <li >
+              <li className={`list-group-item  ${
+                activeCategory === item.title ? 'link-list-group-item bg-danger' : 'list-group-item'
+              }`}>
               <a
                 href='#'
                 className={`${
-                  activeCategory === item.title ? 'link-dark' : 'link-danger'
+                  activeCategory === item.title ? 'text-white' : 'text-dark'
                 }`}
                 onClick={() => handleCategoryClick(item.title)}
               >
@@ -160,15 +163,18 @@ const Menu = () => {
                   />
                   <h3 className="fw-bold my-2">{item.title}</h3>
                   <p className='text-secondary'>It is a long established fact that a reader will be distracted.</p>
-                  <h3 className="text-danger fw-bold">
+                  <h4 className="text-danger fw-bold">
                     ${parseFloat(item.price).toFixed(2)}
-                  </h3>
+                  </h4>
+                  {/*
                   <button 
                     className="btn btn-danger mt-2" 
                     onClick={() => handleAddToCart(item.id, 1)} // Pass the item to the handler
                   >
                     Add to cart
                   </button>
+                  */}
+                  <a href={`/menuitem/${item.id}`} className='btn btn-danger mt-2' >ORDER NOW</a>
                 </div>
               </div>
               ))}

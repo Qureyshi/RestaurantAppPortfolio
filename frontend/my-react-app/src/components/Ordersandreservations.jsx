@@ -3,7 +3,7 @@ import MyFooter from './MyFooter';
 import MyNavbar from './MyNavbar';
 import { FaEye } from 'react-icons/fa';
 import { Modal, Button, Dropdown } from 'react-bootstrap';
-import './Orders.css';
+
 
 const getTokenFromCookies = () => {
   const token = document.cookie.split('; ').find(row => row.startsWith('authToken='));
@@ -22,7 +22,7 @@ const getStatusBadge = (status) => {
   return <span className={`badge ${statusClasses[status] || 'bg-secondary'}`}>{status}</span>;
 };
 
-const Orders = () => {
+const OrderandReservation = () => {
   // Orders Data and User Information
   const [orders, setOrders] = useState([]); // Store list of orders
   const [selectedOrder, setSelectedOrder] = useState(null); // Currently selected order for modal
@@ -484,4 +484,4 @@ const Orders = () => {
   );
 };
 
-export default Orders;
+export default OrderandReservation;

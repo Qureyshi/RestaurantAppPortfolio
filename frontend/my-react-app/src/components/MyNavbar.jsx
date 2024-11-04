@@ -84,9 +84,6 @@ const MyNavbar = () => {
               </>
             )}
             <li className="nav-item">
-              <Link className="nav-link text-light" to="/orders">Orders</Link>
-            </li>
-            <li className="nav-item">
               <Link className="nav-link text-light" to="/cart">
                 <FaShoppingBasket />
               </Link>

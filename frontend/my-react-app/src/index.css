@@ -208,7 +208,7 @@ font-size: 18px;
 
 
 .orders{
-  background-image: url(images/breadcrumb.jpg);
+  background-image: url('/images/breadcrumb.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
