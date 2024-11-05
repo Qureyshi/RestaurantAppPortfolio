@@ -277,13 +277,14 @@ const OrderandReservation = () => {
       <div className="content-wrapper">
         <MyNavbar />
 
-        <main className="container mt-5">
+        <main className="container mt-5" >
 
         <h2 className='fw-bold'>Your Reservations</h2>
           {loading ? (
             <div>Loading your reservations...</div>
           ) : (
             reservations.length > 0 ? (
+            <div style={{ overflowY: "auto" }}>
               <table className="table table-striped">
                 <thead>
                   <tr>
@@ -306,11 +307,12 @@ const OrderandReservation = () => {
                   ))}
                 </tbody>
               </table>
+            </div>
             ) : (
               <p>You have no reservations.</p>
             )
           )}
-          <div className="pagination-controls">
+          <div className="d-flex justify-content-center align-items-center my-3">
             <button
               className="btn btn-secondary me-2"
               disabled={reservationPage <= 1}
@@ -328,25 +330,13 @@ const OrderandReservation = () => {
             </button>
           </div>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
           <h2 className="mb-4">Order List</h2>
 
           {error && <div className="alert alert-danger">{error}</div>}
           {orders.length === 0 ? (
             <p>No orders found.</p>
           ) : (
+          <div style={{ overflowY: "auto" }}>
             <table className="table table-striped">
               <thead>
                 <tr>
@@ -419,10 +409,11 @@ const OrderandReservation = () => {
                 ))}
               </tbody>
             </table>
+          </div>
           )}
 
           {/* Pagination Controls */}
-          <div className="pagination-controls">
+          <div className="d-flex justify-content-center align-items-center my-3">
             <button
               className="btn btn-secondary me-2"
               disabled={page <= 1}

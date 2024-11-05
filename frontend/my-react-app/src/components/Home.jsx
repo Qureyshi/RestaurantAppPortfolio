@@ -13,28 +13,28 @@ const Home = () => {
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         height: '90vh', // Adjust as needed
+        
       }}
       
       
       >
 
         
-        <div className="container" >
-          <div className="row">
-            <div className="col-6 d-flex justify-content-center align-items-center">
-              <div data-aos="fade-left">
-              <h4 className="text-danger fw-bold">Experience the finest dining in the city</h4>
-              <h1 className="font-60 fw-bold">Welcome to Our Restaurant</h1>
-              
-              <a href="#menu" className="btn btn-danger mt-4">View Our Menu</a>
-              </div>
-            </div>
-            <div className="col-6" data-aos="fade-up">
-              <img src="images/chiken.png" alt="" />
-            </div>
-          </div>
-          
-        </div>
+<div className="container">
+  <div className="row">
+    <div className="col-12 col-md-6 d-flex flex-column justify-content-center align-items-center text-center text-md-start">
+      <div data-aos="fade-left">
+        <h4 className="text-danger fw-bold">Experience the finest dining in the city</h4>
+        <h1 className="font-60 fw-bold">Welcome to Our Restaurant</h1>
+        <a href="#menu" className="btn btn-danger mt-4">View Our Menu</a>
+      </div>
+    </div>
+    <div className="col-12 col-md-6 mt-4 mt-md-0 overflow-hidden d-flex justify-content-center align-items-center" data-aos="fade-up">
+      <img src="images/chiken.png" alt="Delicious chicken dish" className="img-fluid" />
+    </div>
+  </div>
+</div>
+
         
       </header>
 
@@ -44,8 +44,8 @@ const Home = () => {
 
 
   <div className="container py-5">
-    <div className='row'>
-      <div className="col-4">
+    <div className='row g-3'>
+      <div className="col-lg-4">
         <div className="bg-success d-flex align-items-center justify-content-center  h-100 py-3" data-aos="zoom-in">
           <div>
             <h4 className='text-center text-white fw-bold'>FRIDAY SPECIAL</h4>
@@ -54,49 +54,42 @@ const Home = () => {
           </div>
         </div>
       </div>
-      <div className=" row col-8">
-        <div className="col-6 ">
-          <div className="bg-danger h-100 d-flex align-items-center" data-aos="zoom-in" >
-            <img src="https://swigo.dexignzone.com/xhtml/assets/images/adv/pic3.png" alt="" />
+      <div className="col-lg-8">
+        <div className='row g-3'>
+          <div className="col-lg-6 ">
+            <div className="bg-danger h-100 d-flex align-items-center" data-aos="zoom-in" >
+              <img src="https://swigo.dexignzone.com/xhtml/assets/images/adv/pic3.png" alt="" />
+              <div>
+                <h3 className='text-white fw-bold'>TODAY SPECIAL</h3>
+                <h1 className='text-white fw-bold'>NODELS</h1>
+                <h2 className='text-warning fw-bold'>60% OFF</h2>
+                <a href="" className='btn btn-light'>Add To Cart</a>
+              </div>
+            </div>
+          </div>
+          <div className="col-lg-6 ">
+            <div className="bg-warning h-100 d-flex align-items-center" data-aos="zoom-in">
+              <img src="images/burger-2.png" alt="" />
+              <div>
+                <h3 className='text-white fw-bold'>MUSHROOM</h3>
+                <h1 className='text-white fw-bold'>BURGER</h1>
+                <a href="" className='btn btn-light'>Add To Cart</a>
+              </div>
+            </div>
+          </div>
+          <div className="col-12">
             <div>
-              <h3 className='text-white fw-bold'>TODAY SPECIAL</h3>
-              <h1 className='text-white fw-bold'>NODELS</h1>
-              <h2 className='text-warning fw-bold'>60% OFF</h2>
-              <a href="" className='btn btn-light'>Add To Cart</a>
+              <div className="bg-dark position-relative p-5" data-aos="zoom-in">
+
+                <h1 className='text-white fw-bold'>35% Offer</h1>
+                <h6 className='text-white fw-bold'>FOR LIMITED TIME ONLY</h6>
+
+               <img src="images/pic4.png" alt=""  className='banner-img-4'/>
+              </div>
+      
             </div>
           </div>
         </div>
-        <div className="col-6 ">
-          <div className="bg-warning h-100 d-flex align-items-center" data-aos="zoom-in">
-            <img src="images/burger-2.png" alt="" />
-            <div>
-              <h3 className='text-white fw-bold'>MUSHROOM</h3>
-              <h1 className='text-white fw-bold'>BURGER</h1>
-              <a href="" className='btn btn-light'>Add To Cart</a>
-            </div>
-          </div>
-        </div>
-        <div className="col-12 mt-4">
-          <div>
-            <div className="bg-dark position-relative p-5" data-aos="zoom-in">
-             
-              <h1 className='text-white fw-bold'>35% Offer</h1>
-              <h6 className='text-white fw-bold'>FOR LIMITED TIME ONLY</h6>
-             
-             <img src="images/pic4.png" alt=""  className='banner-img-4'/>
-            </div>
- 
-          </div>
-        </div>
-
-
-
-
-
-
-
-
-
       </div>
       
 
@@ -117,17 +110,17 @@ const Home = () => {
   <section>
       <div className="">
         <div className="row">
-          <div className="col-4 p-5"     style={{ backgroundImage: `url('images/food-bg.jpg')`, backgroundSize: 'cover', backgroundPosition: 'center'}} >
+          <div className="col-lg-4 p-5"     style={{ backgroundImage: `url('images/food-bg.jpg')`, backgroundSize: 'cover', backgroundPosition: 'center'}} >
             <p className='text-warning fw-bold'>START PRICE 25$</p>
             <h1 className='text-white fw-bold'>DELICIOUS <br/> HAMBURGER <br/> FRIES</h1>
             <a href="" className='btn btn-danger'>ORDER NOW</a>
           </div>
-          <div className="col-4 p-5"     style={{ backgroundImage: `url('images/food-bg-2.jpg')`, backgroundSize: 'cover', backgroundPosition: 'center'}} >
+          <div className="col-lg-4 p-5"     style={{ backgroundImage: `url('images/food-bg-2.jpg')`, backgroundSize: 'cover', backgroundPosition: 'center'}} >
             <p className='text-warning fw-bold'>START PRICE 25$</p>
             <h1 className='text-white fw-bold'>DELICIOUS <br/> HAMBURGER <br/> FRIES</h1>
             <a href="" className='btn btn-danger'>ORDER NOW</a>
           </div>
-          <div className="col-4 p-5"     style={{ backgroundImage: `url('images/food-bg-3.jpg')`, backgroundSize: 'cover', backgroundPosition: 'center'}} >
+          <div className="col-lg-4 p-5"     style={{ backgroundImage: `url('images/food-bg-3.jpg')`, backgroundSize: 'cover', backgroundPosition: 'center'}} >
             <p className='text-warning fw-bold'>START PRICE 25$</p>
             <h1 className='text-white fw-bold'>DELICIOUS <br/> HAMBURGER <br/> FRIES</h1>
             <a href="" className='btn btn-danger'>ORDER NOW</a>
@@ -147,7 +140,7 @@ const Home = () => {
   
   <section className="py-5 bg-light d-flex align-items-center" style={{ minHeight: '300px' }}>
       <div className="container d-flex justify-content-between align-items-center">
-        <div>
+        <div data-aos="fade-right">
           <h1 className="display-4">Experience of Real Recipes Taste</h1>
           <div className="d-flex mt-4">
             <div className="me-5">
@@ -160,7 +153,7 @@ const Home = () => {
             </div>
           </div>
         </div>
-        <div>
+        <div data-aos="fade-left">
           <img src="https://images.pexels.com/photos/2159065/pexels-photo-2159065.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="Salmon Dish" className="img-fluid" />
         </div>
       </div>

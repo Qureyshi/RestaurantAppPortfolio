@@ -151,7 +151,7 @@ const Cart = () => {
                 {loading ? (
                     <div className="text-center">Loading...</div>
                 ) : (
-                    <div className="row">
+                    <div className="row"  style={{ overflowY: "auto" }}>
                         <div className="col-12">
                             <table className="table .table-borderless text-center">
                                 <tbody>

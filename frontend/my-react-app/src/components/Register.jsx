@@ -76,7 +76,7 @@ const Register = () => {
           <Link className='text-white h1' to="/"><FaHome /></Link>
         </div>
         <div className="row rounded overflow-hidden shadow-lg bg-white g-0 position-relative">
-          <div className="col-8">
+          <div className="col-lg-7">
             <div
                className=""
                style={{
@@ -89,14 +89,14 @@ const Register = () => {
              > 
              </div> 
           </div>
-          <div className="col-4 position-relative login z-0 d-flex justify-content-center align-items-center overflow-hidden">
+          <div className="col-lg-5 position-relative login z-0 d-flex justify-content-center align-items-center overflow-hidden">
             <div className='p-5 z-1'>
               <h2 className="card-title mb-2">Register</h2>
               <p className='mb-5'>Sign in with your email adress and password</p>
               {error && <div className="alert alert-danger">{error}</div>} {/* Display error message */}
               <form onSubmit={handleSubmit}>
                 <div className="mb-4">
-                  <label htmlFor="username" className="form-label">Username</label>
+                  <label htmlFor="username" className="form-label fw-bold">Username</label>
                   <input
                     type="text"
                     className="form-control"
@@ -108,7 +108,7 @@ const Register = () => {
                   />
                 </div>
                 <div className="mb-4">
-                  <label htmlFor="email" className="form-label">Email address</label>
+                  <label htmlFor="email" className="form-label fw-bold">Email address</label>
                   <input
                     type="email"
                     className="form-control"
@@ -120,7 +120,7 @@ const Register = () => {
                   />
                 </div>
                 <div className="mb-3">
-                  <label htmlFor="password" className="form-label">Password</label>
+                  <label htmlFor="password" className="form-label fw-bold">Password</label>
                   <input
                     type="password"
                     className="form-control"

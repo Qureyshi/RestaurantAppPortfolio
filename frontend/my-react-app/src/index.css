@@ -1,7 +1,9 @@
 body{
   background-color: #f4f1ea;
 }
-
+#root{
+  overflow-x: hidden;
+}
 
 a{
   text-decoration: none;

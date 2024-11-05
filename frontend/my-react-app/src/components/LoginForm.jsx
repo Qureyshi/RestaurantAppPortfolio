@@ -55,7 +55,7 @@ const LoginForm = () => {
         <Link className='text-white h1' to="/"><FaHome /></Link>
      </div>
      <div className="row rounded  overflow-hidden shadow-lg bg-white g-0 position-relative">
-      <div className="col-4 position-relative login z-0  d-flex justify-content-center align-items-center overflow-hidden">
+      <div className="col-lg-5 position-relative login z-0  d-flex justify-content-center align-items-center overflow-hidden">
         <div className='p-5 z-1'>
           <h2 className='mb-2' >Welcome Back</h2>
           <p className='mb-5'>Sign in with your email adress and password</p>
@@ -95,7 +95,7 @@ const LoginForm = () => {
           </div>
         </div>
       </div>
-      <div className="col-8">
+      <div className="col-lg-7">
         <div
            className=""
            style={{
