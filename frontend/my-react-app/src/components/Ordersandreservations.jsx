@@ -271,9 +271,9 @@ const OrderandReservation = () => {
       <div className="content-wrapper">
         <MyNavbar />
 
-        <main className="container mt-5" >
+        <main className="container  mt-5" >
 
-        <h2 className='fw-bold'>Your Reservations</h2>
+        <h2 className='fw-bold mb-4'>Your Reservations</h2>
           {loading ? (
             <div>Loading your reservations...</div>
           ) : (
@@ -306,7 +306,7 @@ const OrderandReservation = () => {
               <p>You have no reservations.</p>
             )
           )}
-          <div className="d-flex justify-content-center align-items-center my-3">
+          { reservations.length > 0 ? ( <div className="d-flex justify-content-center align-items-center my-3">
             <button
               className="btn btn-secondary me-2"
               disabled={reservationPage <= 1}
@@ -322,7 +322,7 @@ const OrderandReservation = () => {
             >
               Next
             </button>
-          </div>
+          </div>) : null }
 
           <h2 className="mb-4">Order List</h2>
 
@@ -407,6 +407,7 @@ const OrderandReservation = () => {
           )}
 
           {/* Pagination Controls */}
+          {orders.length > 0  ? (
           <div className="d-flex justify-content-center align-items-center my-3">
             <button
               className="btn btn-secondary me-2"
@@ -423,7 +424,7 @@ const OrderandReservation = () => {
             >
               Next
             </button>
-          </div>
+          </div>) : null }
 
           {selectedOrder && (
             <Modal show={showModal} onHide={handleCloseModal}>

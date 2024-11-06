@@ -101,6 +101,45 @@ const Menu = () => {
     return pages;
   };
 
+
+  const handleAddToCart = async (menuItemId, quantity) => {
+    try {
+      const token = document.cookie.split('; ').find(row => row.startsWith('authToken='));
+      if (!token) {
+        console.error('No auth token found');
+        return;
+      }
+      const authToken = token.split('=')[1].trim();
+
+      const response = await fetch('http://localhost:8000/api/cart/menu-items', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Token ${authToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          menuitem_id: menuItemId,
+          quantity: quantity,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error adding item to cart:', errorText);
+        return;
+      }
+
+      const data = await response.json();
+      console.log('Item added to cart:', data);
+      setCartItems(prevItems => [...prevItems, data]); // Update UI if needed
+    } catch (error) {
+      console.error('Error adding item to cart:', error);
+    }
+  };  
+
+
+
+
   if (loadingCategories || loadingMenu) {
     return <div>Loading...</div>;
   }
@@ -150,10 +189,16 @@ const Menu = () => {
                       className="object-fit-cover"
                       style={{ width: '100%', height: '250px' }}
                     />
-                    <h3 className="fw-bold my-2">{item.title}</h3>
+                    <a href={`/menuitem/${item.id}`}  className='text-decoration-none text-dark'><h3 className="fw-bold my-2">{item.title}</h3></a>
                     <p className='text-secondary'>It is a long established fact that a reader will be distracted.</p>
                     <h4 className="text-danger fw-bold">${parseFloat(item.price).toFixed(2)}</h4>
-                    <a href={`/menuitem/${item.id}`} className='btn btn-danger mt-2'>ORDER NOW</a>
+                    
+                    <button 
+                    className="btn btn-danger mt-2" 
+                    onClick={() => handleAddToCart(item.id, 1)} // Pass the item to the handler
+                  >
+                    Add to cart
+                  </button>
                   </div>
                 </div>
               ))}

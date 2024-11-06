@@ -121,8 +121,8 @@ const Menuitem = () => {
   return (
     <>
       <MyNavbar />
-      <div className="container-fluid p-5 text-center text-danger">
-        <h1 className="font-weight-bold">SINGLE MENU ITEM</h1>
+      <div className="container-fluid p-5  orders">
+        <h1 className="p-5 text-center text-danger">SINGLE MENU ITEM</h1>
       </div>
       
       <div className="container py-5 my-5">
