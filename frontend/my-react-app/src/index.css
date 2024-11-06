@@ -13,6 +13,7 @@ a{
   font-size: 60px;
 }
 
+
 /* home*/
 
 
@@ -104,6 +105,39 @@ background-repeat: no-repeat;
   position: absolute;
   top: -40px;
   right: 0;
+}
+
+
+
+
+
+
+input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%; /* Circular thumb */
+  background: red; /* Red thumb */
+  border: none;
+  cursor: pointer;
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%; /* Circular thumb */
+  background: red; /* Red thumb */
+  border: none;
+  cursor: pointer;
+}
+
+input[type="range"]::-ms-thumb {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%; /* Circular thumb */
+  background: rgb(161, 64, 64); /* Red thumb */
+  border: none;
+  cursor: pointer;
 }
 
 
