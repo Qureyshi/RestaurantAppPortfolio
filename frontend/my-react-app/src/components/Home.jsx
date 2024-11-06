@@ -50,7 +50,7 @@ const Home = () => {
           <div>
             <h4 className='text-center text-white fw-bold'>FRIDAY SPECIAL</h4>
             <h1 className='text-center text-warning fw-bold'> TASTY BURGER</h1>
-            <img src="https://foodking-react.vercel.app/assets/img/food/main-food.png" alt="Tasty Burger" class="img-fluid" />
+            <img src="https://foodking-react.vercel.app/assets/img/food/main-food.png" alt="Tasty Burger" className="img-fluid" />
           </div>
         </div>
       </div>

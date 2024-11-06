@@ -15,7 +15,7 @@ urlpatterns = [
     path('reservations', views.ReservationListCreateView.as_view()),
     path('reservations/<int:pk>', views.ReservationRetrieveUpdateView.as_view()),
 
-    path('menu-items/<int:pk>/reviews', views.ReviewListCreateView.as_view()),
+    path('menu-items/<int:menu_item_id>/reviews', views.ReviewListCreateView.as_view()),
 
     path('groups/manager/users', views.GroupViewSet.as_view(
         {'get': 'list', 'post': 'create', 'delete': 'destroy'})),

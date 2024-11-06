@@ -129,7 +129,6 @@ const Cart = () => {
                 throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
             }
             const orderData = await response.json();
-            console.log('Order created successfully:', orderData);
             setCartItems([]);
         } catch (error) {
             setOrderError(error.message);
@@ -151,9 +150,9 @@ const Cart = () => {
                 {loading ? (
                     <div className="text-center">Loading...</div>
                 ) : (
-                    <div className="row"  style={{ overflowY: "auto" }}>
+                    <div className="row" style={{ overflowY: "auto" }}>
                         <div className="col-12">
-                            <table className="table .table-borderless text-center">
+                            <table className="table text-center">
                                 <tbody>
                                     {cartItems.map(item => {
                                         const unitPrice = parseFloat(item.unit_price) || 0;
@@ -165,17 +164,17 @@ const Cart = () => {
                                                 <td className='p-5'>{item.menuitem.title}</td>
                                                 <td className='p-5'>${unitPrice.toFixed(2)}</td>
                                                 <td className='p-5'>
-                                                    <button 
+                                                    <span 
                                                         onClick={() => updateQuantity(item.menuitem.id, item.quantity - 1, 'decrease')} 
-                                                        className="btn btn-secondary mx-2"
+                                                        style={{ cursor: 'pointer', padding: '0 10px', color: loadingItems[item.menuitem.id] || item.quantity <= 1 ? 'grey' : 'black' }}
                                                         disabled={loadingItems[item.menuitem.id] || item.quantity <= 1}
-                                                    >-</button>
+                                                    >-</span>
                                                     {item.quantity}
-                                                    <button 
+                                                    <span 
                                                         onClick={() => updateQuantity(item.menuitem.id, item.quantity + 1, 'increase')} 
-                                                        className="btn btn-secondary mx-2"
+                                                        style={{ cursor: 'pointer', padding: '0 10px', color: loadingItems[item.menuitem.id] ? 'grey' : 'black' }}
                                                         disabled={loadingItems[item.menuitem.id]}
-                                                    >+</button>
+                                                    >+</span>
                                                 </td>
                                                 <td className='p-5'>${(unitPrice * item.quantity).toFixed(2)}</td>
                                                 <td className='p-5'>

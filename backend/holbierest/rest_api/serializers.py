@@ -57,7 +57,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
 class OrderSerializer(serializers.ModelSerializer):
 
-    #user = CustomUserSerializer()
+    user = CustomUserSerializer(read_only=True)
     orderitem = OrderItemSerializer(many=True, read_only=True, source='order')
     date = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", read_only=True)
 
@@ -65,13 +65,26 @@ class OrderSerializer(serializers.ModelSerializer):
         model = Order
         fields = ['id', 'user', 'delivery_crew',
                   'status', 'date', 'total', 'orderitem']
+        
+    def create(self, validated_data):
+        # Set the user as the logged-in user
+        validated_data['user'] = self.context['request'].user
+        return super().create(validated_data)
 
 
 
 class ReviewSerializer(serializers.ModelSerializer):
+    # Display user details (id and username)
+    user = CustomUserSerializer(read_only=True)
+
     class Meta:
         model = Review
         fields = ['id', 'user', 'menu_item', 'rating', 'comment', 'created_at']
+
+    def create(self, validated_data):
+        # Set the user as the logged-in user
+        validated_data['user'] = self.context['request'].user
+        return super().create(validated_data)
 
 
 class ReservationSerializer(serializers.ModelSerializer):

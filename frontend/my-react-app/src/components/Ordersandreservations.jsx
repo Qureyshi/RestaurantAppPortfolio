@@ -264,13 +264,7 @@ const OrderandReservation = () => {
 
   const handleReservationPageChange = (newPage) => {
     if (newPage > 0 && newPage <= totalReservationPages) setReservationPage(newPage);
-  };
-
-  // Log the props at the start of the component
-  console.log('User Role:', userRole);
-  console.log('Order:', orders);
-  console.log('Delivery Crew Options:', deliveryCrewOptions);
-
+  };  
 
   return (
     <>
@@ -354,7 +348,7 @@ const OrderandReservation = () => {
                   <tr key={order.id}>
                     <td>#{order.id}</td>
                     <td>{new Date(order.date).toLocaleString()}</td>
-                    <td>{order.user}</td>
+                    <td>{order.user.username}</td>
                     <td>
                       {userRole === 'Admin' || userRole === 'Manager' ? (
                         <Dropdown onSelect={(crewId) => handleAssignDeliveryCrew(order.id, crewId)}>

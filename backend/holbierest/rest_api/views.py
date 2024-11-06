@@ -147,7 +147,7 @@ class OrderView(generics.ListCreateAPIView):
         data['total'] = total
         data['user'] = self.request.user.id
         data['date'] = timezone.now()  # Set the current date and time
-        order_serializer = OrderSerializer(data=data)
+        order_serializer = OrderSerializer(data=data, context={'request': request})
         
         if order_serializer.is_valid():
             order = order_serializer.save()
@@ -307,7 +307,12 @@ class ReservationRetrieveUpdateView(generics.RetrieveUpdateAPIView):
 class ReviewListCreateView(generics.ListCreateAPIView):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
-    permission_classes = [IsAuthenticated]
+    
+    def get_permissions(self):
+        permission_classes = []
+        if self.request.method != 'GET':
+            permission_classes = [IsAuthenticated]
+        return [permission() for permission in permission_classes]
 
     def get_queryset(self):
         menu_item_id = self.kwargs['menu_item_id']
