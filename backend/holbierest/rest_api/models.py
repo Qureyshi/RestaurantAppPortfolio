@@ -1,6 +1,25 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.conf import settings
+from django.contrib.auth.models import AbstractUser
 
+class SiteSettings(models.Model):
+    bonus_percentage = models.DecimalField(max_digits=4, decimal_places=2, default=2.0)  # Default to 2%
+    class Meta:
+        verbose_name = "Site Setting"
+        verbose_name_plural = "Site Settings"
+
+    def __str__(self):
+        return "Site Settings"
+    
+class CustomUser(AbstractUser):
+    phone_number = models.CharField(max_length=15, blank=True, null=True)
+    address = models.CharField(max_length=255, blank=True, null=True)
+    date_of_birth = models.DateField(blank=True, null=True)
+    bonus_earned = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
+    tip = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
+
+    def __str__(self):
+        return self.username
 
 class Category(models.Model):
     slug = models.SlugField()
@@ -25,7 +44,7 @@ class MenuItem(models.Model):
     
 
 class Review(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     menu_item = models.ForeignKey(MenuItem, on_delete=models.CASCADE, related_name='reviews')
     rating = models.PositiveIntegerField(choices=[(i, i) for i in range(1, 6)])  # Rating from 1 to 5
     comment = models.TextField(blank=True)
@@ -36,7 +55,7 @@ class Review(models.Model):
 
 
 class Cart(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     menuitem = models.ForeignKey(MenuItem, on_delete=models.CASCADE)
     quantity = models.SmallIntegerField()
     unit_price = models.DecimalField(max_digits=6, decimal_places=2)
@@ -56,9 +75,9 @@ class Order(models.Model):
         ('PENDING', 'Pending'),
         ('CANCELLED', 'Cancelled'),
     ]
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     delivery_crew = models.ForeignKey(
-        User, on_delete=models.SET_NULL, related_name="delivery_crew", null=True)
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, related_name="delivery_crew", null=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='PENDING')
     total = models.DecimalField(max_digits=6, decimal_places=2, default=0)
     date = models.DateTimeField(auto_now_add=True)  # Use DateTimeField
@@ -83,7 +102,7 @@ class OrderItem(models.Model):
     from django.db import models
 
 class Reservation(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name='reservations')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, related_name='reservations')
     date = models.DateField()
     time = models.TimeField()
     phone_number = models.CharField(max_length=15)

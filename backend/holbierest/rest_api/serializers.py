@@ -1,15 +1,18 @@
 from rest_framework import serializers
 from djoser.serializers import UserSerializer as DjoserUserSerializer
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from decimal import Decimal
 
-from .models import Category, MenuItem, Cart, Order, OrderItem, Reservation, Review
+from .models import Category, MenuItem, Cart, Order, OrderItem, Reservation, Review, CustomUser
 
+
+# Get the custom user model
+User = get_user_model()
 
 class CustomUserSerializer(DjoserUserSerializer):
     class Meta:
-        model = User
-        fields = ('id', 'username', 'email', 'is_staff', 'groups')
+        model = CustomUser
+        fields = ('id', 'username', 'email', 'is_staff', 'groups', 'bonus_earned', 'tip', 'phone_number', 'address', 'date_of_birth')
 
 class CategorySerializer (serializers.ModelSerializer):
     class Meta:

@@ -1,6 +1,7 @@
+from decimal import Decimal
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
-from .models import Category, MenuItem, Cart, Order, OrderItem, Reservation, Review
+from .models import Category, MenuItem, Cart, Order, OrderItem, Reservation, Review, SiteSettings
 from .paginations import CustomPagination
 from .permissions import IsManagerMemberOrAdmin
 from django_filters.rest_framework import DjangoFilterBackend
@@ -11,10 +12,14 @@ from rest_framework.permissions import IsAdminUser
 from django.shortcuts import  get_object_or_404
 from django.utils import timezone
 
-from django.contrib.auth.models import Group, User
+from django.contrib.auth.models import Group
+from django.contrib.auth import get_user_model
 
 from rest_framework import viewsets
 from rest_framework import status
+
+# Get the custom user model
+User = get_user_model()
 
 
 class CategoriesView(generics.ListCreateAPIView):
@@ -124,7 +129,8 @@ class OrderView(generics.ListCreateAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
     permission_classes = [IsAuthenticated]
-
+    
+    
     def get_queryset(self):
         if self.request.user.is_superuser:
             return Order.objects.all()
@@ -134,8 +140,11 @@ class OrderView(generics.ListCreateAPIView):
             return Order.objects.all().filter(delivery_crew=self.request.user)  #only show oreders assigned to him
         else: #delivery crew or manager
             return Order.objects.all()
-        # else:
-        #     return Order.objects.all()
+        
+    def get_bonus_percentage(self):
+        # Retrieve or create SiteSettings instance
+        settings, created = SiteSettings.objects.get_or_create(id=1, defaults={'bonus_percentage': Decimal('2.0')})
+        return settings.bonus_percentage / 100  # Convert to decimal
 
     def create(self, request, *args, **kwargs):
         menuitem_count = Cart.objects.all().filter(user=self.request.user).count()
@@ -164,8 +173,16 @@ class OrderView(generics.ListCreateAPIView):
             # Clear the cart after creating the order
             items.delete()
 
+            # Calculate bonus and update user's bonus_earned
+            bonus_percentage = self.get_bonus_percentage()  # Retrieve bonus percentage
+            bonus = total * bonus_percentage
+            self.request.user.bonus_earned += bonus
+            self.request.user.save()
+
+            # Include updated bonus in response
             result = order_serializer.data
             result['total'] = total
+            result['bonus_earned'] = self.request.user.bonus_earned  # Send updated bonus to client
             return Response(result, status=status.HTTP_201_CREATED)
 
         # If the serializer is not valid, return an error response
