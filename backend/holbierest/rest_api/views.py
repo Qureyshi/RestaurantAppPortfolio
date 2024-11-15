@@ -129,38 +129,59 @@ class OrderView(generics.ListCreateAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
     permission_classes = [IsAuthenticated]
-    
-    
+
     def get_queryset(self):
         if self.request.user.is_superuser:
             return Order.objects.all()
-        elif self.request.user.groups.count()==0: #normal customer - no group
-            return Order.objects.all().filter(user=self.request.user)
-        elif self.request.user.groups.filter(name='Delivery Crew').exists(): #delivery crew
-            return Order.objects.all().filter(delivery_crew=self.request.user)  #only show oreders assigned to him
-        else: #delivery crew or manager
+        elif self.request.user.groups.count() == 0:  # Normal customer - no group
+            return Order.objects.filter(user=self.request.user)
+        elif self.request.user.groups.filter(name='Delivery Crew').exists():  # Delivery crew
+            return Order.objects.filter(delivery_crew=self.request.user)  # Show orders assigned to them
+        else:  # Other roles, e.g., managers
             return Order.objects.all()
-        
+
     def get_bonus_percentage(self):
-        # Retrieve or create SiteSettings instance
+        # Retrieve or create the SiteSettings instance
         settings, created = SiteSettings.objects.get_or_create(id=1, defaults={'bonus_percentage': Decimal('2.0')})
-        return settings.bonus_percentage / 100  # Convert to decimal
+        return settings.bonus_percentage / Decimal('100')  # Convert to decimal percentage
 
     def create(self, request, *args, **kwargs):
-        menuitem_count = Cart.objects.all().filter(user=self.request.user).count()
+        # Ensure the cart has items
+        menuitem_count = Cart.objects.filter(user=self.request.user).count()
         if menuitem_count == 0:
-            return Response({"message:": "no item in cart"})
+            return Response({"message": "No items in cart"}, status=status.HTTP_400_BAD_REQUEST)
 
         data = request.data.copy()
-        total = self.get_total_price(self.request.user)
+        total = self.get_total_price(self.request.user)  # Get total price from the cart        
         data['total'] = total
         data['user'] = self.request.user.id
         data['date'] = timezone.now()  # Set the current date and time
-        order_serializer = OrderSerializer(data=data, context={'request': request})
+
+        # Optional tip provided by the user
+        tip = Decimal(request.data.get('tip', Decimal('0.0')))
         
+        # Check if the user wants to use bonus
+        bonus_used = Decimal(request.data.get('bonus_used', '0.0'))  # Bonus user wants to apply
+        bonus_available = self.request.user.bonus_earned
+
+        # Ensure bonus used is not more than the available bonus
+        if bonus_used > bonus_available:
+            return Response({"message": "Insufficient bonus balance."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Apply the bonus to the total price
+        total_after_bonus = total - bonus_used       
+        if total_after_bonus < 0:
+            total_after_bonus = Decimal('0.0')  # If bonus exceeds total, set total to 0
+            bonus_used = total
+        
+        data['total_after_bonus'] = total_after_bonus  # Send the total after applying bonus
+
+        order_serializer = OrderSerializer(data=data, context={'request': request})
+
         if order_serializer.is_valid():
             order = order_serializer.save()
 
+            # Process items from the cart and save them to the OrderItem model
             items = Cart.objects.filter(user=self.request.user)
             for item in items:
                 OrderItem.objects.create(
@@ -170,30 +191,43 @@ class OrderView(generics.ListCreateAPIView):
                     quantity=item.quantity
                 )
 
-            # Clear the cart after creating the order
+            # Clear the cart after the order is created
             items.delete()
 
-            # Calculate bonus and update user's bonus_earned
+            # Calculate and apply bonus for the user
             bonus_percentage = self.get_bonus_percentage()  # Retrieve bonus percentage
-            bonus = total * bonus_percentage
+            bonus = total_after_bonus * bonus_percentage
             self.request.user.bonus_earned += bonus
+            
+            # Deduct the bonus from the user's bonus_earned balance
+            self.request.user.bonus_earned -= bonus_used
+            
             self.request.user.save()
+
+            # Store the customer's tip in the user's profile
+            if tip > Decimal('0.0'):
+                self.request.user.tip += tip
+                self.request.user.save()
 
             # Include updated bonus in response
             result = order_serializer.data
-            result['total'] = total
+            result['total'] = total           
+            result['bonus_used'] = bonus_used
             result['bonus_earned'] = self.request.user.bonus_earned  # Send updated bonus to client
+            result['total_after_bonus'] = total_after_bonus  # Include total after bonus in the response
+            result['tip'] = tip  # Send the tip (stored in the customer's field)
             return Response(result, status=status.HTTP_201_CREATED)
 
-        # If the serializer is not valid, return an error response
+        # If the serializer is not valid, return the error response
         return Response(order_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
     def get_total_price(self, user):
-        total = 0
-        items = Cart.objects.all().filter(user=user).all()
-        for item in items.values():
-            total += item['price']
-        return total
+        total = Decimal('0.0')  # Use Decimal for currency calculations
+        items = Cart.objects.filter(user=user)
+        
+        for item in items:            
+            total += item.price        
+        return Decimal(total)
 
 
 class SingleOrderView(generics.RetrieveUpdateAPIView):
@@ -209,20 +243,37 @@ class SingleOrderView(generics.RetrieveUpdateAPIView):
         # Retrieve the order instance
         order = self.get_object()
 
-        # Update the order status if provided
-        new_status = request.data.get('status')
-        if new_status is not None:
-            order.status = new_status
-
         # Assign delivery crew if provided
         delivery_crew_id = request.data.get('delivery_crew')
-        
         if delivery_crew_id is not None:
             try:
-                delivery_crew = User.objects.get(id=int(delivery_crew_id), groups__name='Delivery Crew')               
+                # Check that the user is a valid delivery crew member
+                delivery_crew = User.objects.get(id=int(delivery_crew_id), groups__name='Delivery Crew')
                 order.delivery_crew = delivery_crew
-            except User.DoesNotExist:                
+            except User.DoesNotExist:
                 return Response({'error': 'Invalid delivery crew ID.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Check if the status is being updated
+        new_status = request.data.get('status')
+        if new_status is not None:
+            # Update the status
+            order.status = new_status
+
+        # Trigger tip transfer if conditions are met
+        if new_status in ['READY', 'DELIVERED']:
+            if order.delivery_crew:  # Ensure a delivery crew is assigned
+                if order.user.tip > Decimal('0.0'):  # Check if customer has a tip
+                    # Transfer the tip
+                    order.delivery_crew.tip += order.user.tip
+                    order.user.tip = Decimal('0.0')  # Reset the customer's tip
+                    order.user.save()
+                    order.delivery_crew.save()
+                else:
+                    # Log or handle the case where no tip exists
+                    print(f"Order {order.id} has no tip to transfer.")
+            else:
+                # Log or handle the case where no delivery crew is assigned
+                print(f"Order {order.id} has no delivery crew assigned for tip transfer.")
 
         # Save the updated order
         order.save()
@@ -230,7 +281,6 @@ class SingleOrderView(generics.RetrieveUpdateAPIView):
         # Serialize and return the updated order
         serializer = self.get_serializer(order)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
 
 
 class GroupViewSet(viewsets.ViewSet):
