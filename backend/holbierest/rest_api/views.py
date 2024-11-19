@@ -2,9 +2,11 @@ from decimal import Decimal
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from .models import Category, MenuItem, Cart, Order, OrderItem, Reservation, Review, SiteSettings
-from .paginations import CustomPagination
 from .permissions import IsManagerMemberOrAdmin
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import SearchFilter, OrderingFilter
+from rest_framework.pagination import PageNumberPagination
+from .filters import MenuItemFilter
 from .serializers import CategorySerializer, MenuItemSerializer, CartSerializer, OrderSerializer, CustomUserSerializer, ReservationSerializer, ReviewSerializer
 from rest_framework.response import Response
 
@@ -36,11 +38,15 @@ class CategoriesView(generics.ListCreateAPIView):
 class MenuItemsView(generics.ListCreateAPIView):
     queryset = MenuItem.objects.all()
     serializer_class = MenuItemSerializer
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['category__title']  # Fields to filter on
-    #pagination_class = CustomPagination
-    search_fields = ['title', 'category__title']
-    ordering_fields = ['price', 'title', 'category__title']
+    pagination_class = PageNumberPagination  # Uses the global PAGE_SIZE
+    filter_backends = [
+        DjangoFilterBackend,
+        SearchFilter,
+        OrderingFilter
+    ]
+    search_fields = ['title', 'category__title']  # Search by these fields
+    filterset_class = MenuItemFilter  # Custom filter for price range and category
+    ordering_fields = ['price']  # Enables ordering by price
 
     def get_permissions(self):
         permission_classes = []
