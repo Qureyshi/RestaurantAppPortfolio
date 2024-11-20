@@ -9,35 +9,27 @@ const Menu = () => {
   const [loadingMenu, setLoadingMenu] = useState(true);
   const [errorCategories, setErrorCategories] = useState('');
   const [errorMenu, setErrorMenu] = useState('');
-  const [activeCategory, setActiveCategory] = useState('Main Meals');
+  const [activeCategory, setActiveCategory] = useState(1);
   const [nextPage, setNextPage] = useState(null);
   const [previousPage, setPreviousPage] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);  
- 
+  const [totalPages, setTotalPages] = useState(1);
   const [minPrice, setMinPrice] = useState(0); // Default minimum price
   const [maxPrice, setMaxPrice] = useState(100); // Default maximum price
+  const [searchQuery, setSearchQuery] = useState(''); // New state for search query
+  const [sortOrder, setSortOrder] = useState(''); // State for sorting
 
   const handleMinSliderChange = (e) => {
     const value = Math.min(e.target.value, maxPrice); // Prevent min > max
     setMinPrice(value);
+    setCurrentPage(1); // Reset to first page on price change
   };
 
   const handleMaxSliderChange = (e) => {
     const value = Math.max(e.target.value, minPrice); // Prevent max < min
     setMaxPrice(value);
+    setCurrentPage(1); // Reset to first page on price change
   };
-
-  const handleMinInputChange = (e) => {
-    const value = Math.min(e.target.value, maxPrice); // Prevent min > max
-    setMinPrice(value);
-  };
-
-  const handleMaxInputChange = (e) => {
-    const value = Math.max(e.target.value, minPrice); // Prevent max < min
-    setMaxPrice(value);
-  };
-
 
   const fetchCategories = async () => {
     try {
@@ -54,13 +46,15 @@ const Menu = () => {
 
   const fetchMenuData = async (url) => {
     try {
-      const response = await fetch(url);
+      const response = await fetch(
+        `${url}&price_min=${minPrice}&price_max=${maxPrice}&ordering=${sortOrder}`
+      );
       if (!response.ok) throw new Error('Failed to fetch menu items');
       const data = await response.json();
       setMenuData(data.results || []);
       setNextPage(data.next);
       setPreviousPage(data.previous);
-      setTotalPages(Math.ceil(data.count/8));
+      setTotalPages(Math.ceil(data.count / 8));
     } catch (err) {
       setErrorMenu(err.message);
     } finally {
@@ -70,27 +64,37 @@ const Menu = () => {
 
   useEffect(() => {
     fetchCategories();
-    fetchMenuData(`http://localhost:8000/api/menu-items?category__title=${activeCategory}&page=${currentPage}`);
-  }, [activeCategory, currentPage]);
+    fetchMenuData(
+      `http://localhost:8000/api/menu-items?category=${activeCategory}&page=${currentPage}&search=${searchQuery}`
+    );
+  }, [activeCategory, currentPage, searchQuery, sortOrder, minPrice, maxPrice]);
 
-  const handleCategoryClick = (categoryTitle) => {
-    setActiveCategory(categoryTitle);
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault(); // Prevent form submission refresh
+    setCurrentPage(1); // Reset to the first page
+    fetchMenuData(
+      `http://localhost:8000/api/menu-items?category=${activeCategory}&page=1&search=${searchQuery}`
+    );
+  };
+
+  const handleSortChange = (e) => {
+    setSortOrder(e.target.value);
+    setCurrentPage(1); // Reset to the first page when sorting changes
+  };
+
+
+  const handleCategoryClick = (categoryId) => {
+    setActiveCategory(categoryId);
     setCurrentPage(1);
+    setMinPrice(0); // Reset min price
+    setMaxPrice(100); // Reset max price
+    setSearchQuery(''); 
+    setSortOrder('');
   };
-
-  const handleNextPage = () => {
-    if (nextPage) setCurrentPage((prev) => prev + 1);
-  };
-
-  const handlePreviousPage = () => {
-    if (previousPage) setCurrentPage((prev) => prev - 1);
-  };
-
-  const handlePageClick = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
-
-  
 
   const renderPageNumbers = () => {
     const pages = [];
@@ -102,7 +106,7 @@ const Menu = () => {
           <button
             key={i}
             className={`btn ${i === currentPage ? 'btn-danger' : 'btn-outline-danger'} mx-1`}
-            onClick={() => handlePageClick(i)}
+            onClick={() => setCurrentPage(i)}
           >
             {i}
           </button>
@@ -112,59 +116,22 @@ const Menu = () => {
           <button
             key={i}
             className={`btn ${i === currentPage ? 'btn-danger' : 'btn-outline-danger'} mx-1`}
-            onClick={() => handlePageClick(i)}
+            onClick={() => setCurrentPage(i)}
           >
             {i}
           </button>
         );
       } else if (i === currentPage - range - 1 || i === currentPage + range + 1) {
         pages.push(
-          <span key={`ellipsis-${i}`} className="mx-1">...</span>
+          <span key={`ellipsis-${i}`} className="mx-1">
+            ...
+          </span>
         );
       }
     }
 
     return pages;
   };
-
-
-  const handleAddToCart = async (menuItemId, quantity) => {
-    try {
-      const token = document.cookie.split('; ').find(row => row.startsWith('authToken='));
-      if (!token) {
-        console.error('No auth token found');
-        return;
-      }
-      const authToken = token.split('=')[1].trim();
-
-      const response = await fetch('http://localhost:8000/api/cart/menu-items', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Token ${authToken}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          menuitem_id: menuItemId,
-          quantity: quantity,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Error adding item to cart:', errorText);
-        return;
-      }
-
-      const data = await response.json();
-      console.log('Item added to cart:', data);
-      setCartItems(prevItems => [...prevItems, data]); // Update UI if needed
-    } catch (error) {
-      console.error('Error adding item to cart:', error);
-    }
-  };  
-
-
-
 
   if (loadingCategories || loadingMenu) {
     return <div>Loading...</div>;
@@ -177,108 +144,91 @@ const Menu = () => {
   return (
     <>
       <MyNavbar />
-      <div className="container-fluid p-5 orders">
-        <div className="p-5 text-center text-danger">
-          <h1 className="font-weight-bold">MENU</h1>
+      <div className='container-fluid p-5 orders'>
+        <div className='p-5 text-center text-danger'>
+          <h1>Menu</h1>
         </div>
       </div>
-
       <div className="container py-5">
         <div className="row g-4">
           <div className="col-lg-2">
-            <div>
-              <h4 className='fw-bold mb-3'>Categories</h4>
-              <ul className='list-group'>
-                {categoryData.map((item) => (
-                  <li
-                    key={item.id}
-                    className={`list-group-item ${activeCategory === item.title ? 'bg-danger' : ''}`}
+            <h4 className="fw-bold mb-3">Categories</h4>
+            <ul className="list-group">
+              {categoryData.map((item) => (
+                <li
+                  key={item.id}
+                  className={`list-group-item ${activeCategory === item.id ? 'bg-danger' : ''}`}
+                >
+                  <a
+                    href="#"
+                    className={`${activeCategory === item.id ? 'text-white' : 'text-dark'}`}
+                    onClick={() => handleCategoryClick(item.id)}
                   >
-                    <a
-                      href='#'
-                      className={`${activeCategory === item.title ? 'text-white' : 'text-dark'}`}
-                      onClick={() => handleCategoryClick(item.title)}
-                    >
-                      {item.title}
-                    </a>
-                  </li>
-                ))}
-              </ul>
+                    {item.title}
+                  </a>
+                </li>
+              ))}
+            </ul>
+            <div className="mt-5">
+              <form onSubmit={handleSearchSubmit}>
+                <input
+                  type="text"
+                  placeholder="Search menu items..."
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                  className="form-control"
+                />
+                <button type="submit" className="btn btn-danger mt-2">
+                  Search
+                </button>
+              </form>
             </div>
-            <div>
-              
-      
-        <h4 className='mt-5'>Search</h4>
-        <input type="text" placeholder="Search menu items..." />
-              
-      <h4 className='mt-5'>Filter by Price</h4>
-      <div>
-        <label>Min Price:</label>
-        <input
-          type="range"
-          min="0"
-          max="40"
-          value={minPrice}
-          onChange={handleMinSliderChange}
-          className='w-100'
-        />
-      </div>
-
-      {/* Max Price Slider and Input */}
-      <div>
-        <label>Max Price:</label>
-        <input
-          type="range"
-          min="0"
-          max="40"
-          value={maxPrice}
-          onChange={handleMaxSliderChange}
-          className='w-100'
-        />
-      </div>
-
-      <p>
-        Price: ${minPrice} - ${maxPrice}
-      </p>
-      <button className='btn btn-danger'>FILTER</button>
-    </div>
-
-
-
-  <div className='mt-4'>
-    <div class="form-check ">
-    <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" />
-    <label class="form-check-label" for="flexCheckDefault">
-      Price low to high
-    </label>
-    </div>
-
-    <div class="form-check">
-    <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" />
-    <label class="form-check-label" for="flexCheckDefault">
-     Price high to low
-    </label>
-    </div>
-  </div>
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      
-
+            <div className="mt-4">
+              <h5 className="fw-bold mb-2">Filter by Price</h5>
+              <div>
+                <label htmlFor="min-price" className="form-label">
+                  Min Price: ${minPrice}
+                </label>
+                <input
+                  id="min-price"
+                  type="range"
+                  className="form-range"
+                  min="0"
+                  max="100"
+                  step="1"
+                  value={minPrice}
+                  onChange={handleMinSliderChange}
+                />
+              </div>
+              <div>
+                <label htmlFor="max-price" className="form-label">
+                  Max Price: ${maxPrice}
+                </label>
+                <input
+                  id="max-price"
+                  type="range"
+                  className="form-range"
+                  min="0"
+                  max="100"
+                  step="1"
+                  value={maxPrice}
+                  onChange={handleMaxSliderChange}
+                />
+              </div>
+            </div>
+            <div className="mt-4">
+              <select
+                value={sortOrder}
+                onChange={handleSortChange}
+                className="form-select"
+              >
+                <option value="">Sort By</option>
+                <option value="price">Price: Low to High</option>
+                <option value="-price">Price: High to Low</option>
+              </select>
+            </div>
           </div>
+
           <div className="col-lg-10">
             <div className="row g-4">
               {menuData.map((item) => (
@@ -290,44 +240,38 @@ const Menu = () => {
                       className="object-fit-cover"
                       style={{ width: '100%', height: '250px' }}
                     />
-                    <a href={`/menuitem/${item.id}`}  className='text-decoration-none text-dark'><h3 className="fw-bold my-2  text-center">{item.title}</h3></a>
-                    <p className='text-secondary text-center'>It is a long established fact that a reader will be distracted.</p>
-                    <h4 className="text-danger fw-bold  text-center">${parseFloat(item.price).toFixed(2)}</h4>
-                    
-                    <button 
-                    className="btn btn-danger mt-2" 
-                    onClick={() => handleAddToCart(item.id, 1)} // Pass the item to the handler
-                  >
-                    Add to cart
-                  </button>
+                    <a href={`/menuitem/${item.id}`} className="text-decoration-none text-dark">
+                      <h3 className="fw-bold my-2">{item.title}</h3>
+                    </a>
+                    <p className="text-secondary">Description here.</p>
+                    <h4 className="text-danger fw-bold">${parseFloat(item.price).toFixed(2)}</h4>
+                    <button className="btn btn-danger mt-2">Add to cart</button>
                   </div>
                 </div>
               ))}
             </div>
-          </div>
-
-          <div className="d-flex justify-content-center mt-4">
-            {previousPage && (
-              <button
-                className="btn btn-outline-danger mx-2"
-                onClick={handlePreviousPage}
-              >
-                Previous
-              </button>
-            )}
-            {renderPageNumbers()}
-            {nextPage && (
-              <button
-                className="btn btn-outline-danger mx-2"
-                onClick={handleNextPage}
-              >
-                Next
-              </button>
-            )}
+            <div className="d-flex justify-content-center mt-4">
+              {previousPage && (
+                <button
+                  className="btn btn-outline-danger mx-2"
+                  onClick={() => setCurrentPage((prev) => prev - 1)}
+                >
+                  Previous
+                </button>
+              )}
+              {renderPageNumbers()}
+              {nextPage && (
+                <button
+                  className="btn btn-outline-danger mx-2"
+                  onClick={() => setCurrentPage((prev) => prev + 1)}
+                >
+                  Next
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </div>
-
       <MyFooter />
     </>
   );
