@@ -14,21 +14,25 @@ const Menu = () => {
   const [previousPage, setPreviousPage] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [minPrice, setMinPrice] = useState(0); // Default minimum price
-  const [maxPrice, setMaxPrice] = useState(100); // Default maximum price
+  const [priceRange, setPriceRange] = useState({ min: 0, max: 100 });  
+  const [tempMinPrice, setTempMinPrice] = useState(priceRange.min);
+  const [tempMaxPrice, setTempMaxPrice] = useState(priceRange.max);
   const [searchQuery, setSearchQuery] = useState(''); // New state for search query
   const [sortOrder, setSortOrder] = useState(''); // State for sorting
 
   const handleMinSliderChange = (e) => {
-    const value = Math.min(e.target.value, maxPrice); // Prevent min > max
-    setMinPrice(value);
-    setCurrentPage(1); // Reset to first page on price change
+    const value = Math.min(e.target.value, tempMaxPrice); // Prevent min > max
+    setTempMinPrice(value); // Update temporary min price    
   };
 
   const handleMaxSliderChange = (e) => {
-    const value = Math.max(e.target.value, minPrice); // Prevent max < min
-    setMaxPrice(value);
-    setCurrentPage(1); // Reset to first page on price change
+    const value = Math.max(e.target.value, tempMinPrice); // Prevent max < min
+    setTempMaxPrice(value); // Update temporary max price    
+  };
+
+  const handleSliderRelease = () => {
+    setPriceRange({ min: tempMinPrice, max: tempMaxPrice }); // Commit price range
+    setCurrentPage(1); // Reset to the first page
   };
 
   const fetchCategories = async () => {
@@ -47,7 +51,7 @@ const Menu = () => {
   const fetchMenuData = async (url) => {
     try {
       const response = await fetch(
-        `${url}&price_min=${minPrice}&price_max=${maxPrice}&ordering=${sortOrder}`
+        `${url}&price_min=${priceRange.min}&price_max=${priceRange.max}&ordering=${sortOrder}`
       );
       if (!response.ok) throw new Error('Failed to fetch menu items');
       const data = await response.json();
@@ -67,7 +71,7 @@ const Menu = () => {
     fetchMenuData(
       `http://localhost:8000/api/menu-items?category=${activeCategory}&page=${currentPage}&search=${searchQuery}`
     );
-  }, [activeCategory, currentPage, searchQuery, sortOrder, minPrice, maxPrice]);
+  }, [activeCategory, currentPage, searchQuery, sortOrder, priceRange]);
 
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
@@ -187,7 +191,7 @@ const Menu = () => {
               <h5 className="fw-bold mb-2">Filter by Price</h5>
               <div>
                 <label htmlFor="min-price" className="form-label">
-                  Min Price: ${minPrice}
+                  Min Price: ${tempMinPrice}
                 </label>
                 <input
                   id="min-price"
@@ -195,14 +199,16 @@ const Menu = () => {
                   className="form-range"
                   min="0"
                   max="100"
-                  step="1"
-                  value={minPrice}
+                  //step="1"
+                  value={tempMinPrice}
                   onChange={handleMinSliderChange}
+                  onMouseUp={handleSliderRelease} // Trigger on mouse release
+                  onTouchEnd={handleSliderRelease} // Support touch devices
                 />
               </div>
               <div>
                 <label htmlFor="max-price" className="form-label">
-                  Max Price: ${maxPrice}
+                  Max Price: ${tempMaxPrice}
                 </label>
                 <input
                   id="max-price"
@@ -210,9 +216,11 @@ const Menu = () => {
                   className="form-range"
                   min="0"
                   max="100"
-                  step="1"
-                  value={maxPrice}
+                  //step="1"
+                  value={tempMaxPrice}
                   onChange={handleMaxSliderChange}
+                  onMouseUp={handleSliderRelease} // Trigger on mouse release
+                  onTouchEnd={handleSliderRelease} // Support touch devices
                 />
               </div>
             </div>
