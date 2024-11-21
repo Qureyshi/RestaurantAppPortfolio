@@ -53,6 +53,10 @@ const OrderandReservation = () => {
   const [userRole, setUserRole] = useState(null); // Role of the user (Admin, Manager, etc.)
   const [username, setUsername] = useState(null); // Logged-in username
   const [customer_username, setCustomerUsername] = useState(null); // Customer username
+  const [bonus, setBonus] = useState(null);
+  const [tip, setTip] = useState(null);
+
+  const [showDiv, setShowDiv] = useState(1);
 
   const itemsPerPage = 8;
 
@@ -116,6 +120,8 @@ const OrderandReservation = () => {
 
         const data = await response.json();
         setUsername(data.username);
+        setBonus(data.bonus_earned);
+        setTip(data.tip);
 
         const role = data.groups.includes(1)
           ? 'Manager'
@@ -273,196 +279,230 @@ const OrderandReservation = () => {
 
         <main className="container  mt-5" >
 
-        <h2 className='fw-bold mb-4'>Your Reservations</h2>
-          {loading ? (
-            <div>Loading your reservations...</div>
-          ) : (
-            reservations.length > 0 ? (
-            <div style={{ overflowY: "auto" }}>
-              <table className="table table-striped">
-                <thead>
-                  <tr>
-                    <th>Date</th>
-                    <th>Time</th>
-                    <th>Guests</th>
-                    <th>Phone</th>
-                    <th>Comments</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {reservations.map((reservation, index) => (
-                    <tr key={index} className="reservation-item">
-                      <td>{reservation.date}</td>
-                      <td>{reservation.time}</td>
-                      <td>{reservation.number_of_guests}</td>
-                      <td>{reservation.phone_number}</td>
-                      <td>{reservation.message}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+
+
+
+
+
+        <div className="mb-4">
+                <button 
+                    className={`btn btn-danger me-3 ${showDiv === 1 ? 'active' : ''}`}
+                    onClick={() => setShowDiv(1)}
+                >
+                    Your Reservations
+                </button>
+                <button 
+                    className={`btn btn-danger ${showDiv === 2 ? 'active' : ''}`}
+                    onClick={() => setShowDiv(2)}
+                >
+                    Order List
+                </button>
+                
             </div>
-            ) : (
-              <p>You have no reservations.</p>
-            )
-          )}
-          { reservations.length > 0 ? ( <div className="d-flex justify-content-center align-items-center my-3">
-            <button
-              className="btn btn-secondary me-2"
-              disabled={reservationPage <= 1}
-              onClick={() => handleReservationPageChange(reservationPage - 1)}
-            >
-              Previous
-            </button>
-            <span>Page {reservationPage} of {totalReservationPages}</span>
-            <button
-              className="btn btn-secondary ms-2"
-              disabled={reservationPage >= totalReservationPages}
-              onClick={() => handleReservationPageChange(reservationPage + 1)}
-            >
-              Next
-            </button>
-          </div>) : null }
 
-          <h2 className="mb-4">Order List</h2>
+             <p>Bonus: {bonus}</p>
+             <p>Tip :{tip}</p>
 
-          {error && <div className="alert alert-danger">{error}</div>}
-          {orders.length === 0 ? (
-            <p>No orders found.</p>
-          ) : (
-          <div style={{ overflowY: "auto" }}>
-            <table className="table table-striped">
-              <thead>
-                <tr>
-                  <th>Order ID</th>
-                  <th>Date</th>
-                  <th>Customer Name</th>
-                  <th>Delivery Crew</th>
-                  <th>Amount</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {orders.map(order => (
-                  <tr key={order.id}>
-                    <td>#{order.id}</td>
-                    <td>{new Date(order.date).toLocaleString()}</td>
-                    <td>{order.user.username}</td>
-                    <td>
-                      {userRole === 'Admin' || userRole === 'Manager' ? (
-                        <Dropdown onSelect={(crewId) => handleAssignDeliveryCrew(order.id, crewId)}>
-                          <Dropdown.Toggle variant="primary" size="sm" id="dropdown-crew">
-                            {order.delivery_crew
-                              ? deliveryCrewOptions.find(crew => crew.id === order.delivery_crew)?.username
-                              : 'Assign Crew'}
-                          </Dropdown.Toggle>
-                          <Dropdown.Menu>
-                            {deliveryCrewOptions.map(crew => (
-                              <Dropdown.Item key={crew.id} eventKey={crew.id}>
-                                {crew.username}
-                              </Dropdown.Item>
-                            ))}
-                          </Dropdown.Menu>
-                        </Dropdown>
+            {/* Divs Section */}
+            <div className="text-center">
+                {showDiv === 1 && (
+                   <div>
+                    <h2 className='fw-bold mb-4'>Your Reservations</h2>
+                   {loading ? (
+                     <div>Loading your reservations...</div>
+                   ) : (
+                     reservations.length > 0 ? (
+                     <div style={{ overflowY: "auto" }}>
+                       <table className="table table-striped">
+                         <thead>
+                           <tr>
+                             <th>Date</th>
+                             <th>Time</th>
+                             <th>Guests</th>
+                             <th>Phone</th>
+                             <th>Comments</th>
+                           </tr>
+                         </thead>
+                         <tbody>
+                           {reservations.map((reservation, index) => (
+                             <tr key={index} className="reservation-item">
+                               <td>{reservation.date}</td>
+                               <td>{reservation.time}</td>
+                               <td>{reservation.number_of_guests}</td>
+                               <td>{reservation.phone_number}</td>
+                               <td>{reservation.message}</td>
+                             </tr>
+                           ))}
+                         </tbody>
+                       </table>
+                     </div>
+                     ) : (
+                       <p>You have no reservations.</p>
+                     )
+                   )}
+                   { reservations.length > 0 ? ( <div className="d-flex justify-content-center align-items-center my-3">
+                     <button
+                       className="btn btn-secondary me-2"
+                       disabled={reservationPage <= 1}
+                       onClick={() => handleReservationPageChange(reservationPage - 1)}
+                     >
+                       Previous
+                     </button>
+                     <span>Page {reservationPage} of {totalReservationPages}</span>
+                     <button
+                       className="btn btn-secondary ms-2"
+                       disabled={reservationPage >= totalReservationPages}
+                       onClick={() => handleReservationPageChange(reservationPage + 1)}
+                     >
+                       Next
+                     </button>
+                   </div>) : null }
+                    </div>
+                )}
+
+                {showDiv === 2 && (
+                    <div>
+                      <h2 className="mb-4">Order List</h2>
+                      {error && <div className="alert alert-danger">{error}</div>}
+                      {orders.length === 0 ? (
+                        <p>No orders found.</p>
                       ) : (
-                        order.delivery_crew
-                          ? deliveryCrewOptions.find(crew => crew.id === order.delivery_crew)?.username
-                          : 'Unassigned'
-                      )}
-                   </td>
-                    <td>${order.total}</td>
-                    <td>
-                      {editingOrderId === order.id && allowedRoles.includes(userRole) ? (
-                        <Dropdown onSelect={(newStatus) => handleStatusChange(order.id, newStatus)}>
-                          <Dropdown.Toggle variant="primary" size="sm" id="dropdown-status">
-                            {order.status}
-                          </Dropdown.Toggle>
-                          <Dropdown.Menu>
-                            {['PENDING', 'READY', 'DELIVERED', 'CANCELLED'].map(status => (
-                              <Dropdown.Item key={status} eventKey={status}>{status}</Dropdown.Item>
+                      <div style={{ overflowY: "auto" }} >
+                        <table className="table table-striped">
+                          <thead>
+                            <tr>
+                              <th>Order ID</th>
+                              <th>Date</th>
+                              <th>Customer Name</th>
+                              <th>Delivery Crew</th>
+                              <th>Amount</th>
+                              <th>Status</th>
+                              <th>Actions</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {orders.map(order => (
+                              <tr key={order.id}>
+                                <td>#{order.id}</td>
+                                <td>{new Date(order.date).toLocaleString()}</td>
+                                <td>{order.user.username}</td>
+                                <td>
+                                  {userRole === 'Admin' || userRole === 'Manager' ? (
+                                    <Dropdown onSelect={(crewId) => handleAssignDeliveryCrew(order.id, crewId)}>
+                                      <Dropdown.Toggle variant="primary" size="sm" id="dropdown-crew">
+                                        {order.delivery_crew
+                                          ? deliveryCrewOptions.find(crew => crew.id === order.delivery_crew)?.username
+                                          : 'Assign Crew'}
+                                      </Dropdown.Toggle>
+                                      <Dropdown.Menu>
+                                        {deliveryCrewOptions.map(crew => (
+                                          <Dropdown.Item key={crew.id} eventKey={crew.id}>
+                                            {crew.username}
+                                          </Dropdown.Item>
+                                        ))}
+                                      </Dropdown.Menu>
+                                    </Dropdown>
+                                  ) : (
+                                    order.delivery_crew
+                                      ? deliveryCrewOptions.find(crew => crew.id === order.delivery_crew)?.username
+                                      : 'Unassigned'
+                                  )}
+                               </td>
+                                <td>${order.total}</td>
+                                <td>
+                                  {editingOrderId === order.id && allowedRoles.includes(userRole) ? (
+                                    <Dropdown onSelect={(newStatus) => handleStatusChange(order.id, newStatus)}>
+                                      <Dropdown.Toggle variant="primary" size="sm" id="dropdown-status">
+                                        {order.status}
+                                      </Dropdown.Toggle>
+                                      <Dropdown.Menu>
+                                        {['PENDING', 'READY', 'DELIVERED', 'CANCELLED'].map(status => (
+                                          <Dropdown.Item key={status} eventKey={status}>{status}</Dropdown.Item>
+                                        ))}
+                                      </Dropdown.Menu>
+                                    </Dropdown>
+                                  ) : (
+                                    getStatusBadge(order.status)
+                                  )}
+                                </td>
+                                <td>
+                                  <FaEye style={{ cursor: 'pointer', marginRight: '10px' }} onClick={() => handleShowDetails(order)} />
+                                  {allowedRoles.includes(userRole) && (
+                                    <button
+                                      className="btn btn-sm btn-link"
+                                      onClick={() => setEditingOrderId(order.id)}
+                                    >
+                                      Edit Status
+                                    </button>
+                                  )}
+                                </td>
+                              </tr>
                             ))}
-                          </Dropdown.Menu>
-                        </Dropdown>
-                      ) : (
-                        getStatusBadge(order.status)
+                          </tbody>
+                        </table>
+                      </div>
                       )}
-                    </td>
-                    <td>
-                      <FaEye style={{ cursor: 'pointer', marginRight: '10px' }} onClick={() => handleShowDetails(order)} />
-                      {allowedRoles.includes(userRole) && (
+
+                      {/* Pagination Controls */}
+                      {orders.length > 0  ? (
+                      <div className="d-flex justify-content-center align-items-center my-3">
                         <button
-                          className="btn btn-sm btn-link"
-                          onClick={() => setEditingOrderId(order.id)}
+                          className="btn btn-secondary me-2"
+                          disabled={page <= 1}
+                          onClick={() => handlePageChange(page - 1)}
                         >
-                          Edit Status
+                          Previous
                         </button>
+                        <span>Page {page} of {totalPages}</span>
+                        <button
+                          className="btn btn-secondary ms-2"
+                          disabled={page >= totalPages}
+                          onClick={() => handlePageChange(page + 1)}
+                        >
+                          Next
+                        </button>
+                      </div>) : null }
+                      
+                      {selectedOrder && (
+                        <Modal show={showModal} onHide={handleCloseModal}>
+                          <Modal.Header closeButton>
+                            <Modal.Title>Order #{selectedOrder.id} Details</Modal.Title>
+                          </Modal.Header>
+                          <Modal.Body>
+                            <h5>Order Items</h5>
+                            <table className="table">
+                              <thead>
+                                <tr>
+                                  <th>Title</th>
+                                  <th>Quantity</th>
+                                  <th>Price</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {selectedOrder.orderitem.map(item => (
+                                  <tr key={item.menuitem.id}>
+                                    <td>{item.menuitem.title}</td>
+                                    <td>{item.quantity}</td>
+                                    <td>${item.price}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                            <p><strong>Total:</strong> ${selectedOrder.total}</p>
+                            <h5>Status</h5>
+                            <p>{selectedOrder.status}</p>
+                            {statusUpdateLoading && <p>Updating status...</p>}
+                          </Modal.Body>
+                          <Modal.Footer>
+                            <Button variant="secondary" onClick={handleCloseModal}>
+                              Close
+                            </Button>
+                          </Modal.Footer>
+                        </Modal>
                       )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          )}
-
-          {/* Pagination Controls */}
-          {orders.length > 0  ? (
-          <div className="d-flex justify-content-center align-items-center my-3">
-            <button
-              className="btn btn-secondary me-2"
-              disabled={page <= 1}
-              onClick={() => handlePageChange(page - 1)}
-            >
-              Previous
-            </button>
-            <span>Page {page} of {totalPages}</span>
-            <button
-              className="btn btn-secondary ms-2"
-              disabled={page >= totalPages}
-              onClick={() => handlePageChange(page + 1)}
-            >
-              Next
-            </button>
-          </div>) : null }
-
-          {selectedOrder && (
-            <Modal show={showModal} onHide={handleCloseModal}>
-              <Modal.Header closeButton>
-                <Modal.Title>Order #{selectedOrder.id} Details</Modal.Title>
-              </Modal.Header>
-              <Modal.Body>
-                <h5>Order Items</h5>
-                <table className="table">
-                  <thead>
-                    <tr>
-                      <th>Title</th>
-                      <th>Quantity</th>
-                      <th>Price</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {selectedOrder.orderitem.map(item => (
-                      <tr key={item.menuitem.id}>
-                        <td>{item.menuitem.title}</td>
-                        <td>{item.quantity}</td>
-                        <td>${item.price}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-                <p><strong>Total:</strong> ${selectedOrder.total}</p>
-                <h5>Status</h5>
-                <p>{selectedOrder.status}</p>
-                {statusUpdateLoading && <p>Updating status...</p>}
-              </Modal.Body>
-              <Modal.Footer>
-                <Button variant="secondary" onClick={handleCloseModal}>
-                  Close
-                </Button>
-              </Modal.Footer>
-            </Modal>
-          )}
+                    </div>
+                )}
+            </div>
         </main>
         <MyFooter />
       </div>
@@ -470,4 +510,15 @@ const OrderandReservation = () => {
   );
 };
 
-export default OrderandReservation;
+export default OrderandReservation;              
+
+
+
+
+
+
+
+
+
+
+

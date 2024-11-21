@@ -14,7 +14,11 @@ const Cart = () => {
     const [loading, setLoading] = useState(true);
     const [loadingItems, setLoadingItems] = useState({});
     const [orderError, setOrderError] = useState(null);
+    const [bonusUsed, setBonusUsed] = useState(0);  // State for bonus used
+    const [tip, setTip] = useState(1);              // State for tip
+    const [bonusEarned, setBonusEarned] = useState(0); // State for bonus earned
 
+    // Fetch cart items and user data (bonus_earned)
     useEffect(() => {
         const fetchCartItems = async () => {
             const authToken = getTokenFromCookies();
@@ -24,18 +28,34 @@ const Cart = () => {
                 return;
             }
             try {
-                const response = await fetch('http://localhost:8000/api/cart/menu-items', {
+                // Fetch user data to get the bonus earned
+                const userResponse = await fetch('http://localhost:8000/auth/users/me', {
                     method: 'GET',
                     headers: {
                         'Authorization': `Token ${authToken}`,
                         'Content-Type': 'application/json',
                     },
                 });
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                const cartData = await response.json();
+                if (userResponse.ok) {
+                    const userData = await userResponse.json();
+                    setBonusEarned(userData.bonus_earned || 0); // Set the bonus earned
+                } else {
+                    console.error('Failed to fetch user data');
+                }
+
+                // Fetch cart items
+                const cartResponse = await fetch('http://localhost:8000/api/cart/menu-items', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Token ${authToken}`,
+                        'Content-Type': 'application/json',
+                    },
+                });
+                if (!cartResponse.ok) throw new Error(`HTTP error! status: ${cartResponse.status}`);
+                const cartData = await cartResponse.json();
                 setCartItems(cartData.results);
             } catch (error) {
-                console.error('Error fetching cart items:', error);
+                console.error('Error fetching cart items or user data:', error);
             } finally {
                 setLoading(false);
             }
@@ -122,14 +142,17 @@ const Cart = () => {
                     'Authorization': `Token ${authToken}`,
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({}),
+                body: JSON.stringify({
+                    bonus_used: bonusUsed,
+                    tip: tip,
+                }),
             });
             if (!response.ok) {
                 const errorText = await response.text();
                 throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
             }
             const orderData = await response.json();
-            setCartItems([]);
+            setCartItems([]); // Clear cart after successful order
         } catch (error) {
             setOrderError(error.message);
             console.error('Error creating order:', error);
@@ -137,6 +160,7 @@ const Cart = () => {
     };
 
     const subtotal = cartItems.reduce((acc, item) => acc + item.unit_price * item.quantity, 0);
+    const total = subtotal + tip - bonusUsed;
 
     return (
         <>
@@ -191,17 +215,50 @@ const Cart = () => {
                     </div>
                 )}
                 <div className="row">
-                    <div className="col-md-3 offset-md-9">
+                    <div className="col-md-4 offset-md-8">
                         <table className="table">
                             <tbody>
-                                <tr>
-                                    <td>Cart Subtotal</td>
-                                    <td>${subtotal.toFixed(2)}</td>
-                                </tr>
-                                <tr>
-                                    <td>Order Total</td>
-                                    <td>${subtotal.toFixed(2)}</td>
-                                </tr>
+                            <tr>
+    <td>Bonus: <p>{bonusEarned - bonusUsed}</p></td>
+    <td>
+        <input 
+            type="number" 
+            value={bonusUsed} 
+            onChange={e => setBonusUsed(Math.min(Number(e.target.value), bonusEarned))} 
+            min="0" 
+            max={bonusEarned} // Limit to bonus earned
+            className="form-control" 
+        />
+        <label>
+            <input 
+                type="checkbox" 
+                checked={bonusUsed === bonusEarned} // Check if all bonus is used
+                onChange={() => {
+                    const maxBonusAllowed = Math.min(bonusEarned, total); // Calculate the max bonus that can be used
+                    setBonusUsed(maxBonusAllowed); // Set bonusUsed to the smaller value
+                }} 
+            /> Use all bonus
+        </label>
+        
+    </td>
+</tr>
+<tr>
+    <td>Tip</td>
+    <td>
+        <input 
+            type="number" 
+            value={tip} 
+            onChange={e => setTip(Number(e.target.value))} 
+            min="0" 
+            className="form-control" 
+        />
+    </td>
+</tr>
+<tr>
+    <td>Order Total</td>
+    <td>${total.toFixed(2)}</td>
+</tr>
+
                             </tbody>
                         </table>
                         <button className="btn btn-danger w-100" onClick={handleOrder}>Order</button>
