@@ -39,10 +39,6 @@ const Home = () => {
       </header>
 
   
-
-
-
-
   <div className="container py-5">
     <div className='row g-3'>
       <div className="col-lg-4">
@@ -98,15 +94,6 @@ const Home = () => {
 
   </div>
 
-
-
-
-
-
-
-
-
-
   <section>
       <div className="">
         <div className="row">
@@ -160,10 +147,6 @@ const Home = () => {
     </section>
 
 
-
-
-
-
     <div className="bg-dark  text-white  py-5  d-flex justify-content-center align-items-center " 
       style={{
         backgroundImage: `url('images/main-bg.jpg')`,
@@ -193,18 +176,6 @@ const Home = () => {
 
 
       </div>
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -243,16 +214,6 @@ const Home = () => {
         </div>
       </div>
     </section>
-
-
-
-
-
-
-
-
-
-
 
       <MyFooter />
     </>

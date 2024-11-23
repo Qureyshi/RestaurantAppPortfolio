@@ -90,17 +90,21 @@ const Menu = () => {
     setCurrentPage(1); // Reset to the first page when sorting changes
   };
 
-
   const handleCategoryClick = (categoryId) => {
     setActiveCategory(categoryId);
     setCurrentPage(1);
-    setMinPrice(0); // Reset min price
-    setMaxPrice(100); // Reset max price
+    setPriceRange({ min: 0, max: 100 }); // Reset the price range using setPriceRange
     setSearchQuery(''); 
     setSortOrder('');
   };
+  
+
 
   const renderPageNumbers = () => {
+    if (totalPages === 1) {
+      return null; // Don't render anything if there's only 1 page
+    }
+  
     const pages = [];
     const range = 2;
 
@@ -109,7 +113,7 @@ const Menu = () => {
         pages.push(
           <button
             key={i}
-            className={`btn ${i === currentPage ? 'btn-danger' : 'btn-outline-danger'} mx-1`}
+            className={`btn ${i === currentPage ? 'btn-danger' : ''} mx-1`}
             onClick={() => setCurrentPage(i)}
           >
             {i}
@@ -119,7 +123,7 @@ const Menu = () => {
         pages.push(
           <button
             key={i}
-            className={`btn ${i === currentPage ? 'btn-danger' : 'btn-outline-danger'} mx-1`}
+            className={`btn ${i === currentPage ? 'btn-danger' : ''} mx-1`}
             onClick={() => setCurrentPage(i)}
           >
             {i}
@@ -138,39 +142,37 @@ const Menu = () => {
   };
 
   const handleAddToCart = async (menuItemId, quantity) => {
-    try {
-      const token = document.cookie.split('; ').find(row => row.startsWith('authToken='));
-      if (!token) {
-        console.error('No auth token found');
-        return;
-      }
-      const authToken = token.split('=')[1].trim();
-
-      const response = await fetch('http://localhost:8000/api/cart/menu-items', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Token ${authToken}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          menuitem_id: menuItemId,
-          quantity: quantity,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Error adding item to cart:', errorText);
-        return;
-      }
-
-      const data = await response.json();
-      console.log('Item added to cart:', data);
-      setCartItems(prevItems => [...prevItems, data]); // Update UI if needed
-    } catch (error) {
-      console.error('Error adding item to cart:', error);
+  try {
+    const token = document.cookie.split('; ').find(row => row.startsWith('authToken='));
+    if (!token) {
+      console.error('No auth token found');
+      return;
     }
-  };  
+    const authToken = token.split('=')[1].trim();
+
+    const response = await fetch('http://localhost:8000/api/cart/menu-items', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Token ${authToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        menuitem_id: menuItemId,
+        quantity: quantity,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Error adding item to cart:', errorText);
+      return;
+    }
+
+     // Update the cart items dynamically
+  } catch (error) {
+    console.error('Error adding item to cart:', error);
+  }
+};
 
 
 
@@ -212,6 +214,7 @@ const Menu = () => {
               ))}
             </ul>
             <div className="mt-5">
+            <h4 className="fw-bold mb-3">Search</h4>
               <form onSubmit={handleSearchSubmit}>
                 <input
                   type="text"
@@ -265,7 +268,7 @@ const Menu = () => {
                 onChange={handleSortChange}
                 className="form-select"
               >
-                <option value="">Sort By</option>
+                <option value="">Sort By Price</option>
                 <option value="price">Price: Low to High</option>
                 <option value="-price">Price: High to Low</option>
               </select>
@@ -301,16 +304,16 @@ const Menu = () => {
             <div className="d-flex justify-content-center mt-4">
               {previousPage && (
                 <button
-                  className="btn btn-outline-danger mx-2"
+                  className="btn btn-danger mx-2"
                   onClick={() => setCurrentPage((prev) => prev - 1)}
                 >
                   Previous
                 </button>
               )}
-              {renderPageNumbers()}
+              { renderPageNumbers()}
               {nextPage && (
                 <button
-                  className="btn btn-outline-danger mx-2"
+                  className="btn btn-danger mx-2"
                   onClick={() => setCurrentPage((prev) => prev + 1)}
                 >
                   Next

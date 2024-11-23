@@ -30,9 +30,8 @@ import Register from './components/Register.jsx';
 import Home from './components/Home.jsx';
 import OrderandReservation from './components/Ordersandreservations.jsx';
 import Menuitem from './components/Menuitem.jsx';
-
- 
- 
+import MyNavbar from './components/MyNavbar.jsx';
+import MyFooter from './components/MyFooter.jsx';
  
 
 
@@ -76,6 +75,7 @@ function App() {
   return (
  
     <>
+        
       <RouterProvider router={router} />
 
     </>

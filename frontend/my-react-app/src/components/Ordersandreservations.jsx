@@ -274,10 +274,10 @@ const OrderandReservation = () => {
 
   return (
     <>
-      <div className="content-wrapper">
+      <div>
         <MyNavbar />
 
-        <main className="container  mt-5" >
+        <main className="container  min-h my-5 py-5" >
 
 
 
@@ -299,9 +299,10 @@ const OrderandReservation = () => {
                 </button>
                 
             </div>
-
-             <p>Bonus: {bonus}</p>
-             <p>Tip :{tip}</p>
+            <h6>Bonus: {bonus}</h6>
+            {userRole !== 'Customer' && ( 
+              <h6>Tip: {tip}</h6>  
+            )}
 
             {/* Divs Section */}
             <div className="text-center">
@@ -312,7 +313,7 @@ const OrderandReservation = () => {
                      <div>Loading your reservations...</div>
                    ) : (
                      reservations.length > 0 ? (
-                     <div style={{ overflowY: "auto" }}>
+                     <div className='overflow-scroll'>
                        <table className="table table-striped">
                          <thead>
                            <tr>
@@ -340,7 +341,7 @@ const OrderandReservation = () => {
                        <p>You have no reservations.</p>
                      )
                    )}
-                   { reservations.length > 0 ? ( <div className="d-flex justify-content-center align-items-center my-3">
+                   { reservations.length > 0 && totalReservationPages > 1   ? ( <div className="d-flex justify-content-center align-items-center my-5">
                      <button
                        className="btn btn-secondary me-2"
                        disabled={reservationPage <= 1}
@@ -367,7 +368,7 @@ const OrderandReservation = () => {
                       {orders.length === 0 ? (
                         <p>No orders found.</p>
                       ) : (
-                      <div style={{ overflowY: "auto" }} >
+                      <div className='overflow-scroll'>
                         <table className="table table-striped">
                           <thead>
                             <tr>
@@ -444,8 +445,8 @@ const OrderandReservation = () => {
                       )}
 
                       {/* Pagination Controls */}
-                      {orders.length > 0  ? (
-                      <div className="d-flex justify-content-center align-items-center my-3">
+                      {orders.length > 0 && totalPages > 1 ? (
+                      <div className="d-flex justify-content-center align-items-center my-5">
                         <button
                           className="btn btn-secondary me-2"
                           disabled={page <= 1}

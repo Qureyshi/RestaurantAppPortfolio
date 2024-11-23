@@ -13,6 +13,40 @@ a{
   font-size: 60px;
 }
 
+.min-h {
+  min-height: 60vh; /* Or use 80px, 80%, etc., depending on your needs */
+}
+
+/* navbar */
+
+/* Cart Dropdown */
+/* Add hover behavior for the dropdown */
+.nav-item.dropdown:hover .dropdown-menu {
+  display: block !important; /* Show dropdown on hover */
+}
+
+.dropdown-menu {
+  display: none; /* Hide by default */
+}
+
+
+.max-height-300 {
+  max-height: 250px;
+}
+.overflow-auto {
+  overflow-y: auto;
+}
+
+
+
+
+
+
+
+
+
+
+
 
 /* home*/
 

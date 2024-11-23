@@ -148,7 +148,7 @@ const Menuitem = () => {
               <div className="col-lg-5 col-md-6">
                 <h3 className="fw-bold my-3">{menuItem.title.toUpperCase()}</h3>
                 <p>There are many variations of passages of Lorem Ipsum available, but majority have suffered teration in some form, by injected humour, or randomised</p>
-                <h4 className="fw-bold text-success">${menuItem.price}</h4>
+                <h4 className="fw-bold text-danger">${menuItem.price}</h4>
                 <div className="quantity-controls d-flex align-items-center my-3">
                   <span className="fw-bold me-2">Quantity:</span>
                   <span
@@ -161,7 +161,7 @@ const Menuitem = () => {
                     style={{ cursor: 'pointer', padding: '0 10px', color: menuItem.quantity <= 1 ? 'grey' : 'black' }}
                   >+</span>
                 </div>
-                <button className="btn btn-success my-3 w-100" onClick={handleAddToCart}>
+                <button className="btn btn-danger my-3 w-100" onClick={handleAddToCart}>
                   Add to Cart
                 </button>
               </div>
@@ -170,10 +170,10 @@ const Menuitem = () => {
 
             <div className='row'>
               <div className=' offset-lg-1 col-lg-10'>
-                <button className="btn btn-success me-2" onClick={() => setActiveTab('description')}>
+                <button className="btn btn-danger me-2" onClick={() => setActiveTab('description')}>
                     Description
                 </button>
-                <button className="btn btn-success" onClick={() => setActiveTab('review')}>
+                <button className="btn btn-danger" onClick={() => setActiveTab('review')}>
                     Review
                 </button>
               </div>
@@ -186,22 +186,7 @@ const Menuitem = () => {
                                 <div className='mt-3'>
                                     <h3>Experience is over the world visit</h3>
                                     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur vulputate vestibulum Phasellus rhoncus, dolor eget viverra pretium, dolor Numquam odit accusantium odit aut commodi et. Nostrum est atque ut dolorum. Et sequi aut atque doloribus qui. Iure amet in voluptate reiciendis. Perspiciatis consequatur aperiam repellendus velit quia est minima. tellus aliquet nunc vitae ultricies erat elit eu lacus. Vestibulum non justo consectetur, cursus ante, tincidunt sapien. Nulla quis diam sit amet turpis interdum accumsan quis necenim. Vivamus faucibus ex sed nibh egestas elementum. Mauris et bibendum dui. Aenean consequat pulvinar luctus</p>
-                                    <h3 className="mb-0 mt-5">More Details</h3>
-                                    <div className="description-list-items d-flex">
-                                        <ul className="description-list">
-                                            <li><i className="fal fa-check"></i><span>Lorem Ipsum is simply dummy text of the printing and typesetting industry</span></li>
-                                            <li><i className="fal fa-check"></i><span>Lorem Ipsum has been the 's standard dummy text. Lorem Ipsumum is simply dummy text.</span></li>
-                                            <li><i className="fal fa-check"></i><span>Type here your detail one by one li more add</span></li>
-                                            <li><i className="fal fa-check"></i><span>Has been the industry's standard dummy text ever since. Lorem Ips</span></li>
-                                        </ul>
-                                        <ul className="description-list">
-                                            <li><i className="fal fa-check"></i><span>Lorem Ipsum generators on the tend to repeat.</span></li>
-                                            <li><i className="fal fa-check"></i><span>If you are going to use a passage.</span></li>
-                                            <li><i className="fal fa-check"></i><span>Lorem Ipsum generators on the tend to repeat.</span></li>
-                                            <li><i className="fal fa-check"></i><span>Lorem Ipsum generators on the tend to repeat.</span></li>
-                                        </ul>
-                                    </div>
-                                </div>
+                               </div>
                             </div>
                         </div>
                     </div>
@@ -247,7 +232,7 @@ const Menuitem = () => {
                   placeholder="Write your review here"                
                 ></textarea>
               </div>
-              <button type="submit" className="btn btn-success mt-3">Submit Review</button>
+              <button type="submit" className="btn btn-danger mt-3">Submit Review</button>
             </form>
           
             

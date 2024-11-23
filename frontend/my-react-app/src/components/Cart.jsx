@@ -15,7 +15,7 @@ const Cart = () => {
     const [loadingItems, setLoadingItems] = useState({});
     const [orderError, setOrderError] = useState(null);
     const [bonusUsed, setBonusUsed] = useState(0);  // State for bonus used
-    const [tip, setTip] = useState(1);              // State for tip
+    const [tip, setTip] = useState(0);              // State for tip
     const [bonusEarned, setBonusEarned] = useState(0); // State for bonus earned
 
     // Fetch cart items and user data (bonus_earned)
@@ -219,45 +219,57 @@ const Cart = () => {
                         <table className="table">
                             <tbody>
                             <tr>
-    <td>Bonus: <p>{bonusEarned - bonusUsed}</p></td>
-    <td>
-        <input 
-            type="number" 
-            value={bonusUsed} 
-            onChange={e => setBonusUsed(Math.min(Number(e.target.value), bonusEarned))} 
-            min="0" 
-            max={bonusEarned} // Limit to bonus earned
-            className="form-control" 
-        />
-        <label>
-            <input 
-                type="checkbox" 
-                checked={bonusUsed === bonusEarned} // Check if all bonus is used
-                onChange={() => {
-                    const maxBonusAllowed = Math.min(bonusEarned, total); // Calculate the max bonus that can be used
-                    setBonusUsed(maxBonusAllowed); // Set bonusUsed to the smaller value
-                }} 
-            /> Use all bonus
-        </label>
-        
-    </td>
-</tr>
-<tr>
-    <td>Tip</td>
-    <td>
-        <input 
-            type="number" 
-            value={tip} 
-            onChange={e => setTip(Number(e.target.value))} 
-            min="0" 
-            className="form-control" 
-        />
-    </td>
-</tr>
-<tr>
-    <td>Order Total</td>
-    <td>${total.toFixed(2)}</td>
-</tr>
+
+                            <td>
+                               Bonus: <p>{(bonusEarned - bonusUsed).toFixed(2)}</p>
+                            </td>
+                            <td>
+                            <input 
+                                type="number" 
+                                value={bonusUsed || ''}  // Allow input to show what user types
+                                onChange={e => {
+                                    const inputBonus = e.target.value === '' 
+                                        ? '' 
+                                        : Math.min(Number(e.target.value), bonusEarned, subtotal);
+                                    setBonusUsed(inputBonus);
+                                }} 
+                                min="0" 
+                                max={Math.min(bonusEarned, subtotal)} 
+                                className="form-control" 
+                            />
+
+                                <label>
+                                    <input 
+                                        type="checkbox" 
+                                        checked={bonusUsed === Math.min(bonusEarned, subtotal)} 
+                                        onChange={() => {
+                                            const maxBonusAllowed = Math.min(bonusEarned, subtotal);
+                                            setBonusUsed(bonusUsed === maxBonusAllowed ? 0 : maxBonusAllowed);
+                                        }} 
+                                    /> Use all bonus
+                                </label>
+                                </td>
+                            </tr>
+                            <tr>
+                            <td>Tip</td>
+                            <td>
+                            <input 
+                            type="number" 
+                            value={tip || ''}  // Allow the input to be empty or show the current tip
+                            onChange={e => {
+                                const inputTip = e.target.value === '' ? '' : Math.max(0, Number(e.target.value));
+                                setTip(inputTip);
+                            }} 
+                            min="0" 
+                            className="form-control" 
+                            />
+
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Order Total</td>
+                                <td>${Math.max(0, subtotal + tip - bonusUsed).toFixed(2)}</td>
+                            </tr>
 
                             </tbody>
                         </table>

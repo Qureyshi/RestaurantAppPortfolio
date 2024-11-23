@@ -88,15 +88,15 @@ const Reservation = () => {
               <div className="d-flex align-items-center">
                 <div className="p-3">
                   <h3 className='fw-bold'>Address</h3>
-                  <p>Jackpark, Ghana</p>
+                  <p>New York, USA</p>
                 </div>
                 <div className="p-3">
                   <h3 className='fw-bold'>Follow</h3>
                   <ul className="list-inline">
-                    <li className="list-inline-item"><a href="#"><FaFacebookF /></a></li>
-                    <li className="list-inline-item"><a href="#"><FaTwitter /></a></li>
-                    <li className="list-inline-item"><a href="#"><FaInstagram /></a></li>
-                    <li className="list-inline-item"><a href="#"><FaYoutube /></a></li>
+                    <li className="list-inline-item text-danger"><a href="#" className='text-danger'><FaFacebookF /></a></li>
+                    <li className="list-inline-item text-danger"><a href="#" className='text-danger'><FaTwitter /></a></li>
+                    <li className="list-inline-item text-danger"><a href="#" className='text-danger'><FaInstagram /></a></li>
+                    <li className="list-inline-item text-danger"><a href="#" className='text-danger'><FaYoutube /></a></li>
                   </ul>
                 </div>
               </div>
@@ -117,7 +117,7 @@ const Reservation = () => {
                   </div>
                   <div className="col-md-6 mb-4">
                     <label className="mb-2 d-block" htmlFor="phone">Give Phone Number*</label>
-                    <input className='form-control' id="phone" name="phone" type="number" placeholder="Phone Number" value={formData.phone} onChange={handleChange} required />
+                    <input className='form-control' id="phone" name="phone" type="tel" placeholder="Phone Number" value={formData.phone} onChange={handleChange} required />
                   </div>
                   <div className="col-md-6 mb-4">
                     <label className="mb-2 d-block" htmlFor="people">Number of Guests*</label>
