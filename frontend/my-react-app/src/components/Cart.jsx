@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FaTrash } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import MyNavbar from './MyNavbar';
 import MyFooter from './MyFooter';
 
@@ -10,6 +11,7 @@ const getTokenFromCookies = () => {
 };
 
 const Cart = () => {
+    const navigate = useNavigate();
     const [cartItems, setCartItems] = useState([]);
     const [loading, setLoading] = useState(true);
     const [loadingItems, setLoadingItems] = useState({});
@@ -153,6 +155,7 @@ const Cart = () => {
             }
             const orderData = await response.json();
             setCartItems([]); // Clear cart after successful order
+            navigate('/orders'); 
         } catch (error) {
             setOrderError(error.message);
             console.error('Error creating order:', error);

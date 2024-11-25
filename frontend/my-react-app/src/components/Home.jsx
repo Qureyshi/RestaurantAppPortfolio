@@ -12,7 +12,7 @@ const Home = () => {
         backgroundImage: `url('images/hero-bg.jpg')`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
-        height: '90vh', // Adjust as needed
+        height: '100vh', // Adjust as needed
         
       }}
       
@@ -24,12 +24,12 @@ const Home = () => {
   <div className="row">
     <div className="col-12 col-md-6 d-flex flex-column justify-content-center align-items-center text-center text-md-start">
       <div data-aos="fade-left">
-        <h4 className="text-danger fw-bold">Experience the finest dining in the city</h4>
-        <h1 className="font-60 fw-bold">Welcome to Our Restaurant</h1>
-        <a href="#menu" className="btn btn-danger mt-4">View Our Menu</a>
+        <h4 className="text-danger fw-bold">Serving happiness on a plate</h4>
+        <h1 className="fs-1 fs-md-1  fw-bold">Welcome to Our Restaurant</h1>
+        <a href="/menu" className="btn btn-danger mt-4">View Our Menu</a>
       </div>
     </div>
-    <div className="col-12 col-md-6 mt-4 mt-md-0 overflow-hidden d-flex justify-content-center align-items-center" data-aos="fade-up">
+    <div className="d-none d-md-block col-md-6 mt-4 mt-md-0 overflow-hidden d-flex justify-content-center align-items-center" data-aos="fade-up">
       <img src="images/chiken.png" alt="Delicious chicken dish" className="img-fluid" />
     </div>
   </div>
@@ -53,7 +53,7 @@ const Home = () => {
       <div className="col-lg-8">
         <div className='row g-3'>
           <div className="col-lg-6 ">
-            <div className="bg-danger h-100 d-flex align-items-center" data-aos="zoom-in" >
+            <div className="bg-danger h-100 d-flex align-items-center overflow-hidden" data-aos="zoom-in" >
               <img src="https://swigo.dexignzone.com/xhtml/assets/images/adv/pic3.png" alt="" />
               <div>
                 <h3 className='text-white fw-bold'>TODAY SPECIAL</h3>
@@ -64,7 +64,7 @@ const Home = () => {
             </div>
           </div>
           <div className="col-lg-6 ">
-            <div className="bg-warning h-100 d-flex align-items-center" data-aos="zoom-in">
+            <div className="bg-warning h-100 d-flex align-items-center overflow-hidden" data-aos="zoom-in">
               <img src="images/burger-2.png" alt="" />
               <div>
                 <h3 className='text-white fw-bold'>MUSHROOM</h3>
@@ -75,7 +75,7 @@ const Home = () => {
           </div>
           <div className="col-12">
             <div>
-              <div className="bg-dark position-relative p-5" data-aos="zoom-in">
+              <div className="bg-dark position-relative p-5 overflow-hidden" data-aos="zoom-in">
 
                 <h1 className='text-white fw-bold'>35% Offer</h1>
                 <h6 className='text-white fw-bold'>FOR LIMITED TIME ONLY</h6>

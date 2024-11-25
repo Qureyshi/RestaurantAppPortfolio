@@ -95,7 +95,7 @@ const MyNavbar = () => {
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
       <div className="container">
-        <Link className="navbar-brand text-light fs-3 fw-bold" to="/">RMS</Link>
+        <Link className="navbar-brand text-light fs-3 fw-bold" to="/">  <img src="images/logo.png" alt=""   /> RestroFlow</Link>
         <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
           <span className="navbar-toggler-icon"></span>
         </button>
