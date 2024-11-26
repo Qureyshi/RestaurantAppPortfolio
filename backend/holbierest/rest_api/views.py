@@ -1,4 +1,4 @@
-from decimal import Decimal
+from decimal import ROUND_HALF_UP, Decimal
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from .models import Category, MenuItem, Cart, Order, OrderItem, Reservation, Review, SiteSettings
@@ -167,11 +167,12 @@ class OrderView(generics.ListCreateAPIView):
         tip = Decimal(request.data.get('tip', Decimal('0.0')))
         
         # Check if the user wants to use bonus
-        bonus_used = Decimal(request.data.get('bonus_used', '0.0'))  # Bonus user wants to apply
-        bonus_available = self.request.user.bonus_earned
+        bonus_used = Decimal(request.data.get('bonus_used', '0.0')).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+        bonus_available = self.request.user.bonus_earned.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
 
         # Ensure bonus used is not more than the available bonus
         if bonus_used > bonus_available:
+            print(f"Bonus used: {bonus_used}, Bonus available: {bonus_available}")
             return Response({"message": "Insufficient bonus balance."}, status=status.HTTP_400_BAD_REQUEST)
 
         # Apply the bonus to the total price

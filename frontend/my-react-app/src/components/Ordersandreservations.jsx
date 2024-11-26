@@ -58,7 +58,7 @@ const OrderandReservation = () => {
 
   const [showDiv, setShowDiv] = useState(1);
 
-  const itemsPerPage = 8;
+  const itemsPerPage = 6;
 
   useEffect(() => {
     const fetchOrders = async (page) => {

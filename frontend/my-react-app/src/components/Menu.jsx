@@ -58,7 +58,7 @@ const Menu = () => {
       setMenuData(data.results || []);
       setNextPage(data.next);
       setPreviousPage(data.previous);
-      setTotalPages(Math.ceil(data.count / 8));
+      setTotalPages(Math.ceil(data.count / 6));
     } catch (err) {
       setErrorMenu(err.message);
     } finally {
