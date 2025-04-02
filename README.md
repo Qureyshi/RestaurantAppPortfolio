@@ -57,3 +57,7 @@ restaurant-website/
 │   ├── manage.py            # Django management script
 │   └── settings.py          # Django settings file
 └── README.md
+![localhost_5173_menu](https://github.com/user-attachments/assets/b88be222-df6e-4724-8dcc-bb4c91e04dc2)
+
+
+
