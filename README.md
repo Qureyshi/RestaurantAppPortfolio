@@ -20,7 +20,7 @@ A modern restaurant website built with React for the front-end, Bootstrap for st
   - Django
   - SQLite  
   
- 
+ ![ALT](https://github.com/Qureyshi/RestaurantAppPortfolio/blob/main/ef896b57-0636-4637-a30a-7acbb52ee7d9.jpg?raw=true)
   
 ## Installation
 
@@ -59,4 +59,4 @@ restaurant-website/
 └── README.md
  
  
-![ALT](https://github.com/Qureyshi/RestaurantAppPortfolio/blob/main/ef896b57-0636-4637-a30a-7acbb52ee7d9.jpg?raw=true)
+
