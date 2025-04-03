@@ -59,6 +59,6 @@ restaurant-website/
 └── README.md
  
 
-![localhost_5173_menu](https://github.com/user-attachments/assets/f93b9b84-a16e-4a78-925b-a18f237acbf7)
+![localhost_5173_menu](https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2d/05/69/2b/caption.jpg?w=600&h=400&s=1)
 
 
