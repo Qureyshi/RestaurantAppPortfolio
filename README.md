@@ -58,7 +58,4 @@ restaurant-website/
 │   └── settings.py          # Django settings file
 └── README.md
  
-
-![localhost_5173_menu](https://github-production-user-asset-6210df.s3.amazonaws.com/159009151/430113556-f93b9b84-a16e-4a78-925b-a18f237acbf7.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVCODYLSA53PQK4ZA%2F20250403%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250403T194249Z&X-Amz-Expires=300&X-Amz-Signature=07410787c217048e439ea4b6518e5fd402be2e6f3da908e3a15eac64f4fd6daf&X-Amz-SignedHeaders=host)
-
-
+ 
