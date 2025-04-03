@@ -21,7 +21,11 @@ A modern restaurant website built with React for the front-end, Bootstrap for st
   - SQLite  
   
  ![ALT](https://github.com/Qureyshi/RestaurantAppPortfolio/blob/main/ef896b57-0636-4637-a30a-7acbb52ee7d9.jpg?raw=true)
-  
+ ![ALT](https://github.com/Qureyshi/RestaurantAppPortfolio/blob/main/localhost_5173_menu.png?raw=true)
+ ![ALT](https://github.com/Qureyshi/RestaurantAppPortfolio/blob/main/f856d85d-383c-4583-a570-44b586ba7877.jpg?raw=true)
+
+
+ 
 ## Installation
 
 ### 1. Clone the repository
