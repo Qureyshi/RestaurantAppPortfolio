@@ -2,124 +2,124 @@ import React, { useState, useEffect } from 'react';
 import MyFooter from './MyFooter';
 import MyNavbar from './MyNavbar';
 
+// Mock category and menu data
+const mockCategories = [
+  { id: 1, title: 'Pizza' },
+  { id: 2, title: 'Burgers' },
+  { id: 3, title: 'Desserts' },
+];
+
+const mockMenuItems = [
+  { id: 1, title: 'Cheese Pizza', category: 1, price: 25, image: '/images/cheesepizza.jpg' },
+  { id: 2, title: 'Pepperoni Pizza', category: 1, price: 30, image: '/images/peperoni.jpg' },
+  { id: 3, title: 'Classic Burger', category: 1, price: 20, image: '/images/burger1.jpg' },
+  { id: 4, title: 'Cheeseburger', category: 1, price: 22, image: '/images/burger2.jpg' },
+  { id: 5, title: 'Chocolate Cake', category: 3, price: 15, image: '/images/cake1.jpg' },
+  { id: 6, title: 'Ice Cream Sundae', category: 3, price: 18, image: '/images/icecream.jpg' },
+  { id: 7, title: 'Veg Pizza', category: 1, price: 28, image: '/images/veg.jpg' },
+  { id: 8, title: 'Chicken Burger', category: 1, price: 24, image: '/images/burger3.jpg' },
+  { id: 3, title: 'Classic Burger', category: 2, price: 20, image: '/images/burger1.jpg' },
+  { id: 4, title: 'Cheeseburger', category: 2, price: 22, image: '/images/burger2.jpg' },
+  // Add more items if needed
+];
+
 const Menu = () => {
   const [categoryData, setCategoryData] = useState([]);
   const [menuData, setMenuData] = useState([]);
-  const [loadingCategories, setLoadingCategories] = useState(true);
-  const [loadingMenu, setLoadingMenu] = useState(true);
-  const [errorCategories, setErrorCategories] = useState('');
-  const [errorMenu, setErrorMenu] = useState('');
   const [activeCategory, setActiveCategory] = useState(1);
-  const [nextPage, setNextPage] = useState(null);
-  const [previousPage, setPreviousPage] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [priceRange, setPriceRange] = useState({ min: 0, max: 100 });  
-  const [tempMinPrice, setTempMinPrice] = useState(priceRange.min);
-  const [tempMaxPrice, setTempMaxPrice] = useState(priceRange.max);
-  const [searchQuery, setSearchQuery] = useState(''); // New state for search query
-  const [sortOrder, setSortOrder] = useState(''); // State for sorting
+  const [priceRange, setPriceRange] = useState({ min: 0, max: 100 });
+  const [tempMinPrice, setTempMinPrice] = useState(0);
+  const [tempMaxPrice, setTempMaxPrice] = useState(100);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortOrder, setSortOrder] = useState('');
+  const [nextPage, setNextPage] = useState(false);
+  const [previousPage, setPreviousPage] = useState(false);
 
   const handleMinSliderChange = (e) => {
-    const value = Math.min(e.target.value, tempMaxPrice); // Prevent min > max
-    setTempMinPrice(value); // Update temporary min price    
+    const value = Math.min(e.target.value, tempMaxPrice);
+    setTempMinPrice(value);
   };
 
   const handleMaxSliderChange = (e) => {
-    const value = Math.max(e.target.value, tempMinPrice); // Prevent max < min
-    setTempMaxPrice(value); // Update temporary max price    
+    const value = Math.max(e.target.value, tempMinPrice);
+    setTempMaxPrice(value);
   };
 
   const handleSliderRelease = () => {
-    setPriceRange({ min: tempMinPrice, max: tempMaxPrice }); // Commit price range
-    setCurrentPage(1); // Reset to the first page
+    setPriceRange({ min: tempMinPrice, max: tempMaxPrice });
+    setCurrentPage(1);
   };
-
-  const fetchCategories = async () => {
-    try {
-      const response = await fetch('http://localhost:8000/api/categories');
-      if (!response.ok) throw new Error('Failed to fetch categories');
-      const data = await response.json();
-      setCategoryData(data.results || []);
-    } catch (err) {
-      setErrorCategories(err.message);
-    } finally {
-      setLoadingCategories(false);
-    }
-  };
-
-  const fetchMenuData = async (url) => {
-    try {
-      const response = await fetch(
-        `${url}&price_min=${priceRange.min}&price_max=${priceRange.max}&ordering=${sortOrder}`
-      );
-      if (!response.ok) throw new Error('Failed to fetch menu items');
-      const data = await response.json();
-      setMenuData(data.results || []);
-      setNextPage(data.next);
-      setPreviousPage(data.previous);
-      setTotalPages(Math.ceil(data.count / 6));
-    } catch (err) {
-      setErrorMenu(err.message);
-    } finally {
-      setLoadingMenu(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchCategories();
-    fetchMenuData(
-      `http://localhost:8000/api/menu-items?category=${activeCategory}&page=${currentPage}&search=${searchQuery}`
-    );
-  }, [activeCategory, currentPage, searchQuery, sortOrder, priceRange]);
 
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
   };
 
   const handleSearchSubmit = (e) => {
-    e.preventDefault(); // Prevent form submission refresh
-    setCurrentPage(1); // Reset to the first page
-    fetchMenuData(
-      `http://localhost:8000/api/menu-items?category=${activeCategory}&page=1&search=${searchQuery}`
-    );
+    e.preventDefault();
+    setCurrentPage(1);
   };
 
   const handleSortChange = (e) => {
     setSortOrder(e.target.value);
-    setCurrentPage(1); // Reset to the first page when sorting changes
+    setCurrentPage(1);
   };
 
   const handleCategoryClick = (categoryId) => {
     setActiveCategory(categoryId);
     setCurrentPage(1);
-    setPriceRange({ min: 0, max: 100 }); // Reset the price range using setPriceRange
-    setSearchQuery(''); 
+    setPriceRange({ min: 0, max: 100 });
+    setTempMinPrice(0);
+    setTempMaxPrice(100);
+    setSearchQuery('');
     setSortOrder('');
   };
-  
 
+  const handleAddToCart = (menuItemId, quantity) => {
+    console.log(`Add to cart: item ${menuItemId} x ${quantity}`);
+    // Stub logic - you can connect to cart context or localStorage if needed
+  };
+
+  useEffect(() => {
+    setCategoryData(mockCategories);
+
+    let filtered = mockMenuItems.filter(
+      (item) =>
+        item.category === activeCategory &&
+        item.price >= priceRange.min &&
+        item.price <= priceRange.max &&
+        item.title.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    if (sortOrder === 'price') {
+      filtered.sort((a, b) => a.price - b.price);
+    } else if (sortOrder === '-price') {
+      filtered.sort((a, b) => b.price - a.price);
+    }
+
+    const itemsPerPage = 6;
+    const total = filtered.length;
+    const start = (currentPage - 1) * itemsPerPage;
+    const paginatedItems = filtered.slice(start, start + itemsPerPage);
+
+    setMenuData(paginatedItems);
+    setTotalPages(Math.ceil(total / itemsPerPage));
+    setNextPage(currentPage < Math.ceil(total / itemsPerPage));
+    setPreviousPage(currentPage > 1);
+  }, [activeCategory, currentPage, searchQuery, sortOrder, priceRange]);
 
   const renderPageNumbers = () => {
-    if (totalPages === 1) {
-      return null; // Don't render anything if there's only 1 page
-    }
-  
+    if (totalPages === 1) return null;
     const pages = [];
     const range = 2;
 
     for (let i = 1; i <= totalPages; i++) {
-      if (i === 1 || i === totalPages) {
-        pages.push(
-          <button
-            key={i}
-            className={`btn ${i === currentPage ? 'btn-danger' : ''} mx-1`}
-            onClick={() => setCurrentPage(i)}
-          >
-            {i}
-          </button>
-        );
-      } else if (i >= currentPage - range && i <= currentPage + range) {
+      if (
+        i === 1 ||
+        i === totalPages ||
+        (i >= currentPage - range && i <= currentPage + range)
+      ) {
         pages.push(
           <button
             key={i}
@@ -137,53 +137,8 @@ const Menu = () => {
         );
       }
     }
-
     return pages;
   };
-
-  const handleAddToCart = async (menuItemId, quantity) => {
-  try {
-    const token = document.cookie.split('; ').find(row => row.startsWith('authToken='));
-    if (!token) {
-      console.error('No auth token found');
-      return;
-    }
-    const authToken = token.split('=')[1].trim();
-
-    const response = await fetch('http://localhost:8000/api/cart/menu-items', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Token ${authToken}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        menuitem_id: menuItemId,
-        quantity: quantity,
-      }),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Error adding item to cart:', errorText);
-      return;
-    }
-
-     // Update the cart items dynamically
-  } catch (error) {
-    console.error('Error adding item to cart:', error);
-  }
-};
-
-
-
-
-  if (loadingCategories || loadingMenu) {
-    return <div>Loading...</div>;
-  }
-
-  if (errorCategories || errorMenu) {
-    return <div>Error: {errorCategories || errorMenu}</div>;
-  }
 
   return (
     <>
@@ -214,7 +169,7 @@ const Menu = () => {
               ))}
             </ul>
             <div className="mt-5">
-            <h4 className="fw-bold mb-3">Search</h4>
+              <h4 className="fw-bold mb-3">Search</h4>
               <form onSubmit={handleSearchSubmit}>
                 <input
                   type="text"
@@ -237,11 +192,10 @@ const Menu = () => {
                   className="form-range"
                   min="0"
                   max="100"
-                  //step="1"
                   value={tempMinPrice}
                   onChange={handleMinSliderChange}
-                  onMouseUp={handleSliderRelease} // Trigger on mouse release
-                  onTouchEnd={handleSliderRelease} // Support touch devices
+                  onMouseUp={handleSliderRelease}
+                  onTouchEnd={handleSliderRelease}
                 />
               </div>
               <div>
@@ -254,11 +208,10 @@ const Menu = () => {
                   className="form-range"
                   min="0"
                   max="100"
-                  //step="1"
                   value={tempMaxPrice}
                   onChange={handleMaxSliderChange}
-                  onMouseUp={handleSliderRelease} // Trigger on mouse release
-                  onTouchEnd={handleSliderRelease} // Support touch devices
+                  onMouseUp={handleSliderRelease}
+                  onTouchEnd={handleSliderRelease}
                 />
               </div>
             </div>
@@ -286,17 +239,17 @@ const Menu = () => {
                       className="object-fit-cover"
                       style={{ width: '100%', height: '250px' }}
                     />
-                    <a href={`/menuitem/${item.id}`} className="text-decoration-none text-dark">
+                    <a href={`/menuitem/1`} className="text-decoration-none text-dark">
                       <h3 className="fw-bold my-2">{item.title}</h3>
                     </a>
                     <p className="text-secondary">It is a long established fact that a reader will be distracted.</p>
-                    <h4 className="text-danger fw-bold">${parseFloat(item.price).toFixed(2)}</h4>
-                    <button 
-                    className="btn btn-danger mt-2" 
-                    onClick={() => handleAddToCart(item.id, 1)} // Pass the item to the handler
-                  >
-                    Add to cart
-                  </button>
+                    <h4 className="text-danger fw-bold">${item.price.toFixed(2)}</h4>
+                    <button
+                      className="btn btn-danger mt-2"
+                      onClick={() => handleAddToCart(item.id, 1)}
+                    >
+                      Add to cart
+                    </button>
                   </div>
                 </div>
               ))}
@@ -310,7 +263,7 @@ const Menu = () => {
                   Previous
                 </button>
               )}
-              { renderPageNumbers()}
+              {renderPageNumbers()}
               {nextPage && (
                 <button
                   className="btn btn-danger mx-2"

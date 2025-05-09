@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { FaTrash } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useNavigate } from 'react-router-dom';
 import MyNavbar from './MyNavbar';
 import MyFooter from './MyFooter';
 
-// Helper function to retrieve the token from cookies
 const getTokenFromCookies = () => {
     const token = document.cookie.split('; ').find(row => row.startsWith('authToken='));
     return token ? token.split('=')[1].trim() : null;
@@ -16,21 +15,54 @@ const Cart = () => {
     const [loading, setLoading] = useState(true);
     const [loadingItems, setLoadingItems] = useState({});
     const [orderError, setOrderError] = useState(null);
-    const [bonusUsed, setBonusUsed] = useState(0);  // State for bonus used
-    const [tip, setTip] = useState(0);              // State for tip
-    const [bonusEarned, setBonusEarned] = useState(0); // State for bonus earned
+    const [bonusUsed, setBonusUsed] = useState(0);
+    const [tip, setTip] = useState(0);
+    const [bonusEarned, setBonusEarned] = useState(0);
+    const [demoMode, setDemoMode] = useState(false);
 
-    // Fetch cart items and user data (bonus_earned)
     useEffect(() => {
         const fetchCartItems = async () => {
             const authToken = getTokenFromCookies();
-            if (!authToken) {
-                console.error('No auth token found');
-                setLoading(false);
-                return;
-            }
+
+            const dummyCartItems = [
+                {
+                    menuitem: {
+                        id: 1,
+                        title: "Chicken Pizza",
+                        image: "/images/burger1.jpg",
+                    },
+                    unit_price: 10.99,
+                    quantity: 2,
+                },
+                {
+                    menuitem: {
+                        id: 2,
+                        title: "Veggie Burger",
+                        image: "/images/burger2.jpg",
+                    },
+                    unit_price: 8.49,
+                    quantity: 1,
+                },
+                {
+                    menuitem: {
+                        id: 3,
+                        title: "Classic Burger",
+                        image: "/images/burger3.jpg",
+                    },
+                    unit_price: 6.25,
+                    quantity: 3,
+                },
+            ];
+
             try {
-                // Fetch user data to get the bonus earned
+                if (!authToken) {
+                    console.warn('No token found. Using demo data.');
+                    setCartItems(dummyCartItems);
+                    setBonusEarned(5);
+                    setDemoMode(true);
+                    return;
+                }
+
                 const userResponse = await fetch('http://localhost:8000/auth/users/me', {
                     method: 'GET',
                     headers: {
@@ -40,12 +72,9 @@ const Cart = () => {
                 });
                 if (userResponse.ok) {
                     const userData = await userResponse.json();
-                    setBonusEarned(userData.bonus_earned || 0); // Set the bonus earned
-                } else {
-                    console.error('Failed to fetch user data');
+                    setBonusEarned(userData.bonus_earned || 0);
                 }
 
-                // Fetch cart items
                 const cartResponse = await fetch('http://localhost:8000/api/cart/menu-items', {
                     method: 'GET',
                     headers: {
@@ -53,38 +82,34 @@ const Cart = () => {
                         'Content-Type': 'application/json',
                     },
                 });
-                if (!cartResponse.ok) throw new Error(`HTTP error! status: ${cartResponse.status}`);
-                const cartData = await cartResponse.json();
-                setCartItems(cartData.results);
+                if (cartResponse.ok) {
+                    const cartData = await cartResponse.json();
+                    setCartItems(cartData.results);
+                } else {
+                    throw new Error("Cart fetch failed");
+                }
             } catch (error) {
-                console.error('Error fetching cart items or user data:', error);
+                console.error('Using dummy data due to error:', error);
+                setCartItems(dummyCartItems);
+                setBonusEarned(5);
+                setDemoMode(true);
             } finally {
                 setLoading(false);
             }
         };
+
         fetchCartItems();
     }, []);
 
-    const handleRemoveItem = async (menuItemId) => {
-        const authToken = getTokenFromCookies();
-        if (!authToken) {
-            console.error('No auth token found');
+    const handleRemoveItem = (menuItemId) => {
+        if (demoMode) {
+            setCartItems(prevItems => prevItems.filter(item => item.menuitem.id !== menuItemId));
             return;
         }
-        try {
-            const response = await fetch(`http://localhost:8000/api/cart/menu-items/${menuItemId}/`, {
-                method: 'DELETE',
-                headers: { 'Authorization': `Token ${authToken}` },
-            });
-            if (!response.ok) throw new Error(`Failed to delete item`);
-            setCartItems(prevItems => prevItems.filter(item => item.menuitem.id !== menuItemId));
-        } catch (error) {
-            console.error('Error deleting item:', error);
-            alert("Failed to remove item");
-        }
+        // Real API logic here if not demo
     };
 
-    const updateQuantity = async (menuItemId, newQuantity, action) => {
+    const updateQuantity = (menuItemId, newQuantity, action) => {
         if (loadingItems[menuItemId] || newQuantity < 1) return;
 
         setCartItems(prevItems =>
@@ -93,50 +118,42 @@ const Cart = () => {
             )
         );
 
+        if (demoMode) return;
+
         setLoadingItems(prev => ({ ...prev, [menuItemId]: true }));
-
         const authToken = getTokenFromCookies();
-        if (!authToken) {
-            console.error('No auth token found');
-            return;
-        }
-
         const updatedQuantity = action === 'increase' ? 1 : -1;
-        try {
-            const response = await fetch('http://localhost:8000/api/cart/menu-items', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Token ${authToken}`,
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    menuitem_id: menuItemId,
-                    quantity: updatedQuantity,
-                }),
-            });
-            if (!response.ok) {
-                const errorText = await response.text();
-                console.error('Error updating item quantity:', errorText);
-                setCartItems(prevItems =>
-                    prevItems.map(item =>
-                        item.menuitem.id === menuItemId ? { ...item, quantity: newQuantity === item.quantity ? 1 : item.quantity } : item
-                    )
-                );
-            }
-        } catch (error) {
-            console.error('Error updating item quantity:', error);
-        } finally {
-            setLoadingItems(prev => ({ ...prev, [menuItemId]: false }));
-        }
+
+        fetch('http://localhost:8000/api/cart/menu-items', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Token ${authToken}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                menuitem_id: menuItemId,
+                quantity: updatedQuantity,
+            }),
+        }).catch(console.error)
+          .finally(() => setLoadingItems(prev => ({ ...prev, [menuItemId]: false })));
     };
 
     const handleOrder = async () => {
         setOrderError(null);
+
+        if (demoMode) {
+            alert("Order placed successfully (demo mode)");
+            setCartItems([]);
+            navigate('/orders');
+            return;
+        }
+
         const authToken = getTokenFromCookies();
         if (!authToken) {
             console.error('No auth token found');
             return;
         }
+
         try {
             const response = await fetch('http://localhost:8000/api/orders', {
                 method: 'POST',
@@ -153,9 +170,8 @@ const Cart = () => {
                 const errorText = await response.text();
                 throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
             }
-            const orderData = await response.json();
-            setCartItems([]); // Clear cart after successful order
-            navigate('/orders'); 
+            setCartItems([]);
+            navigate('/orders');
         } catch (error) {
             setOrderError(error.message);
             console.error('Error creating order:', error);
@@ -163,7 +179,7 @@ const Cart = () => {
     };
 
     const subtotal = cartItems.reduce((acc, item) => acc + item.unit_price * item.quantity, 0);
-    const total = subtotal + tip - bonusUsed;
+    const total = Math.max(0, subtotal + Number(tip) - Number(bonusUsed));
 
     return (
         <>
@@ -194,13 +210,11 @@ const Cart = () => {
                                                     <span 
                                                         onClick={() => updateQuantity(item.menuitem.id, item.quantity - 1, 'decrease')} 
                                                         style={{ cursor: 'pointer', padding: '0 10px', color: loadingItems[item.menuitem.id] || item.quantity <= 1 ? 'grey' : 'black' }}
-                                                        disabled={loadingItems[item.menuitem.id] || item.quantity <= 1}
                                                     >-</span>
                                                     {item.quantity}
                                                     <span 
                                                         onClick={() => updateQuantity(item.menuitem.id, item.quantity + 1, 'increase')} 
                                                         style={{ cursor: 'pointer', padding: '0 10px', color: loadingItems[item.menuitem.id] ? 'grey' : 'black' }}
-                                                        disabled={loadingItems[item.menuitem.id]}
                                                     >+</span>
                                                 </td>
                                                 <td className='p-5'>${(unitPrice * item.quantity).toFixed(2)}</td>
@@ -221,59 +235,50 @@ const Cart = () => {
                     <div className="col-md-4 offset-md-8">
                         <table className="table">
                             <tbody>
-                            <tr>
-
-                            <td>
-                               Bonus: <p>{(bonusEarned - bonusUsed).toFixed(2)}</p>
-                            </td>
-                            <td>
-                            <input 
-                                type="number" 
-                                value={bonusUsed || ''}  // Allow input to show what user types
-                                onChange={e => {
-                                    const inputBonus = e.target.value === '' 
-                                        ? '' 
-                                        : Math.min(Number(e.target.value), bonusEarned, subtotal);
-                                    setBonusUsed(inputBonus);
-                                }} 
-                                min="0" 
-                                max={Math.min(bonusEarned, subtotal)} 
-                                className="form-control" 
-                            />
-
-                                <label>
-                                    <input 
-                                        type="checkbox" 
-                                        checked={bonusUsed === Math.min(bonusEarned, subtotal)} 
-                                        onChange={() => {
-                                            const maxBonusAllowed = Math.min(bonusEarned, subtotal);
-                                            setBonusUsed(bonusUsed === maxBonusAllowed ? 0 : maxBonusAllowed);
-                                        }} 
-                                    /> Use all bonus
-                                </label>
-                                </td>
-                            </tr>
-                            <tr>
-                            <td>Tip</td>
-                            <td>
-                            <input 
-                            type="number" 
-                            value={tip || ''}  // Allow the input to be empty or show the current tip
-                            onChange={e => {
-                                const inputTip = e.target.value === '' ? '' : Math.max(0, Number(e.target.value));
-                                setTip(inputTip);
-                            }} 
-                            min="0" 
-                            className="form-control" 
-                            />
-
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Order Total</td>
-                                <td>${Math.max(0, subtotal + tip - bonusUsed).toFixed(2)}</td>
-                            </tr>
-
+                                <tr>
+                                    <td>Bonus: <p>{(bonusEarned - bonusUsed).toFixed(2)}</p></td>
+                                    <td>
+                                        <input 
+                                            type="number" 
+                                            value={bonusUsed || ''} 
+                                            onChange={e => {
+                                                const inputBonus = e.target.value === '' 
+                                                    ? '' 
+                                                    : Math.min(Number(e.target.value), bonusEarned, subtotal);
+                                                setBonusUsed(inputBonus);
+                                            }} 
+                                            min="0" 
+                                            max={Math.min(bonusEarned, subtotal)} 
+                                            className="form-control" 
+                                        />
+                                        <label>
+                                            <input 
+                                                type="checkbox" 
+                                                checked={bonusUsed === Math.min(bonusEarned, subtotal)} 
+                                                onChange={() => {
+                                                    const maxBonusAllowed = Math.min(bonusEarned, subtotal);
+                                                    setBonusUsed(bonusUsed === maxBonusAllowed ? 0 : maxBonusAllowed);
+                                                }} 
+                                            /> Use all bonus
+                                        </label>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Tip</td>
+                                    <td>
+                                        <input 
+                                            type="number" 
+                                            value={tip || ''} 
+                                            onChange={e => setTip(Math.max(0, Number(e.target.value)))} 
+                                            min="0" 
+                                            className="form-control" 
+                                        />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Order Total</td>
+                                    <td>${total.toFixed(2)}</td>
+                                </tr>
                             </tbody>
                         </table>
                         <button className="btn btn-danger w-100" onClick={handleOrder}>Order</button>

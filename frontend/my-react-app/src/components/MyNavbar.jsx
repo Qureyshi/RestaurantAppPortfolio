@@ -106,6 +106,9 @@ const MyNavbar = () => {
               <Link className="nav-link text-light" to="/menu">Menu</Link>
             </li>
             <li className="nav-item">
+              <Link className="nav-link text-light" to="/menuitem/1">Menuitem</Link>
+            </li>
+            <li className="nav-item">
               <Link className="nav-link text-light" to="/reservation">Reservation</Link>
             </li>
             {!isLoggedIn && (
@@ -118,23 +121,22 @@ const MyNavbar = () => {
                 </li>
               </>
             )}
-            {isLoggedIn && (
-              <li className="nav-item dropdown hover-dropdown">
+           
+              <li className="nav-item  ">
                 <Link
                   className="nav-link text-light"
                   to="#"
                   id="cartDropdown"
                   role="button"
                   onClick={handleCartClick}
-                  onMouseEnter={() => setIsCartHovered(true)} // Trigger hover state
-                  onMouseLeave={() => setIsCartHovered(false)} // Reset hover state
+                   // Reset hover state
                   aria-expanded="false"
                 >
                   <FaShoppingBasket />
                 </Link>
 
                 {/* Conditionally render cart items or empty message */}
-                {cartItems.length > 0 ? (
+                 
                  <div >
                  <ul
                     className={`dropdown-menu dropdown-menu-end ${cartItems.length > 3 ? 'max-height-300 overflow-auto' : ''}`}
@@ -152,16 +154,9 @@ const MyNavbar = () => {
                     ))}
                   </ul>
                   </div>
-                ) : (
-                  // Message shown when cart is empty
-                  isCartHovered && (
-                    <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="cartDropdown">
-                      <li className="dropdown-item text-center">Your cart is empty</li>
-                    </ul>
-                  )
-                )}
+                 
               </li>
-            )}
+            
             {isLoggedIn && (
               <>
                 <Link className="nav-link text-light" to="/orders">{username}</Link>

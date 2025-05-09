@@ -135,7 +135,7 @@ const Home = () => {
               <p>Daily Orders</p>
             </div>
             <div>
-              <h2>5+</h2>
+              <h2>50+</h2>
               <p>Menu & Dish</p>
             </div>
           </div>
